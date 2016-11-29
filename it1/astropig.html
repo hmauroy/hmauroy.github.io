@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="iso-8859-1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta content="Dette programmet har forskjellige muligheter se Gloer sin nettside:
+    http://gloer.github.io/it2/uke46/astropig.html">
+    <title>AstroPig</title>
+    <style>
+        @keyframes flytt {
+            from {
+                background-position: 0 0;
+            }
+            to {
+                background-position: -1000px 0;
+            }
+        }
+        body {
+            background-image: url("space.png");
+            /*animation: flytt 10s linear infinite;   /* flytter bakgrunnen med lineær bevegelse i det uendelige */
+        }
+        #pig {
+            position: absolute;
+            left: 300px;
+            top: 200px;
+        }
+        .griseknapper {
+            display: flex;  /* flexer innmaten */
+            flex-wrap: wrap;
+            flex-direction: row;
+            width: 30%;     /* 30% av nettsiden */
+            margin: auto;   /* midtstiller knappene på skjermen */
+        }
+        button {
+            flex-basis: 100px; /* aldri smalere enn 200px */
+            height: 70%;
+            width: 40%;
+            padding: 3%;
+            font-size: 3vw; /* view height er størrelsen til browservinduet */
+            margin: auto;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="griseknapper">
+        <button data-xdir="0" data-ydir="-1">Up</button>
+    </div>
+    <div class="griseknapper">
+        <button data-xdir="-1" data-ydir="0">Left</button>
+        <button data-xdir="1" data-ydir="0">Right</button>
+    </div>
+    <div class="griseknapper">
+        <button data-xdir="0" data-ydir="1">Down</button>
+    </div>
+
+    <img src="astropig.png" id="pig">
+
+    <script>
+
+        // data om grisen
+        var grisen = {
+            xpos: 300,
+            ypos: 100,
+            xdir: 1,
+            ydir: 0,
+            xspeed: 5,
+            yspeed: 3,
+            w: 67,
+            h: 108
+        };
+
+        function fly() {
+            grisen.xpos += grisen.xspeed * grisen.xdir;
+            grisen.ypos += grisen.yspeed * grisen.ydir;
+
+            // fikser slik at grisen kommer tilbake på andre siden av bildet
+            if(grisen.xpos > innerWidth) {
+                grisen.xpos = -grisen.w;
+            }
+            if(grisen.xpos < -grisen.w) {
+                grisen.xpos = innerWidth;
+            }
+            if(grisen.ypos > innerHeight) {
+                grisen.ypos = -grisen.h;
+            }
+            if(grisen.ypos < -grisen.h) {
+                grisen.ypos = innerHeight;
+            }
+
+            pig.style.left = grisen.xpos + "px";    // skjøter på px pga dette er CSS
+            pig.style.top = grisen.ypos + "px";    // skjøter på px pga dette er CSS
+
+            // recursiv funksjon som kjører oppå skjermens refreshrate (gjør så ikke det animeres for fort)
+            requestAnimationFrame(fly);
+        }
+        fly();  // start funksjonen
+
+        var knappene = document.querySelectorAll("button"); // henter inn alle 4 knapper samtidig
+        console.log(knappene);
+
+        function setDir() {
+            grisen.xdir = this.getAttribute("data-xdir");
+            grisen.ydir = this.getAttribute("data-ydir");
+        }
+
+        for(var knapp of knappene) {    // går gjennom hver knapp for seg
+            knapp.addEventListener("click", setDir);
+        }
+
+        // Må finne ut når grisen er på utsiden av skjermen og så få grisen til å fortsette fra motsatt ende
+
+
+
+
+        // flytte bakgrunnen med keyframes i stedet for CSS-versjonen i body-regelen
+        var keyframes = [
+            {backgroundPosition: "0 0"},    // posisjon det flyttes fra
+            {backgroundPosition: "-1000px 0"}  // posisjon det flyttes til
+        ];
+        var controls = {
+            duration: 10000,     // varigheten i ms
+            iterations: Infinity,   // Javascript bruker stor I for Infinity
+            easing: "linear"    // lineær bevegelse
+        };
+
+        var animasjon = document.body.animate(keyframes, controls); // animerer keyframes ved bruk av controls parametrene
+
+        // Få bakgrunnen til å reversere ved klikk på skjermen
+ //       document.onclick = function() {
+ //           animasjon.reverse();
+ //           animasjon.playbackRate = 3;
+ //       }
+
+        animasjon.onfinish = function() {   // start animasjonene på nytt
+            alert("FERDIG");
+        };
+
+    </script>
+
+
+
+</body>
+</html>
