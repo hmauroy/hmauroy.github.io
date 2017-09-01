@@ -1,19 +1,39 @@
 <!DOCTYPE html>
-<html lang="no">
+<html lang="en">
 <head>
-    <meta charset="iso-8859-1">
-    <title>henrik</title>
-    <style>
-        body {
-            max-width: 700px;
-            margin: auto;
-            padding: 10px;
+    <meta charset="UTF-8">
+    <meta name="author" content="Henrik Mauroy">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Henrik's github</title>
+    <script>
+        window.onload = oppstart;
+
+        function oppstart() {
+            // Hovedprogramkode her...
+            document.getElementById("message").onmouseover = showImage;
+            document.getElementById("message").onmouseout = hideImage;
         }
+
+        function showImage() {
+            document.getElementById("image").style.visibility = "visible";
+        }
+        function hideImage() {
+            document.getElementById("image").style.visibility = "hidden";
+        }
+
+    </script>
+    <style>
+        img {
+            visibility: hidden;
+        }
+
     </style>
 </head>
 <body>
-    <h1>Hello World</h1>
-    <p>I'm hosted with GitHub Pages.</p>
+
+<h1>Hello World</h1>
+<p> <span id="message">I'm hosted with GitHub Pages.</span></p>
+<img id="image" src="author.jpg">
 
 </body>
 </html>
