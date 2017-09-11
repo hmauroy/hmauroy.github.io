@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="jason.ico">
+    <meta name="author" content="Henrik Mauroy">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Horror</title>
+    <script>
+        window.onload = oppstart;
+
+        var ambient;
+        var highHeels;
+        var scream;
+        var tekst;
+        var btnJa;
+        var btnNei;
+        var door;
+
+        function oppstart() {
+            // Hovedprogramkode her...
+            ambient = document.getElementById("audioAmbient");
+            highHeels = document.getElementById("audioHighHeels");
+            scream = document.getElementById("audioScream");
+            door = document.getElementById("audioDoor");
+            tekst = document.getElementById("tekst");
+            btnNei = document.getElementById("btnNei");
+            btnJa = document.getElementById("btnJa");
+            playAmbient();
+            document.getElementById("test").onclick = chp1;
+
+
+        }
+        function playAmbient() {
+            ambient.play();
+        }
+
+        function playAudio() {
+            scream.play();
+        }
+        function pauseAudio() {
+            scream.pause();
+        }
+
+        function updateButtons(kap) {
+            document.getElementById("btnJa").addEventListener("click", kap);
+            document.getElementById("btnNei").addEventListener("click", showImage);
+        }
+
+        function chp1() {
+            document.body.style.backgroundImage = "url('town1.jpg')";
+            document.getElementById("fjesBilde").src = "";
+            btnJa.style.visibility = "visible";
+            btnNei.style.visibility = "visible";
+            document.getElementById("overskrift").style.visibility = "hidden";
+            document.getElementById("underoverskrift").style.visibility = "hidden";
+            tekst.innerHTML = "Du trasker bortover brosteinen. <br> Det er ganske guffent her... <br> Har du lyst til å gå videre?";
+            console.log("chp1");
+            updateButtons(chp2);
+        }
+        function chp2() {
+            document.body.style.backgroundImage = "url('town2.jpg')";
+            tekst.innerHTML = "Du lister deg videre i mørket. <br> Til venstre for deg er det en gang. <br> Vil du snu deg mot venstre?";
+            console.log("chp2");
+            updateButtons(chp3);
+
+        }
+        function chp3() {
+            document.body.style.backgroundImage = "url('hallway1.jpg')";
+            document.body.style.backgroundRepeat = "norepeat";
+            tekst.innerHTML = "Du snur deg og går hurtig nedover gangen... <br> Vil du fortsette veien mot din sanne død?";
+            console.log("chp3");
+            highHeels.play();
+            updateButtons(chp4);
+
+        }
+        function chp4() {
+            document.body.style.backgroundImage = "url('door.jpg')";
+            highHeels.pause();
+            tekst.innerHTML = "Du kommer så til en ekkel og uhyggelig dør. <br> Vil du åpne den?";
+            console.log("chp4");
+            updateButtons(doorOpens);
+
+        }
+        function doorOpens() {
+            door.play();
+            document.body.style.backgroundImage = "url('door.jpg')";
+            tekst.innerHTML = "Du er ikke helt sikker på om du skal gå inn døren. <br> Vil du gå inn?";
+            console.log("doorOpens");
+            updateButtons(endGame);
+
+        }
+        function endGame() {
+            door.pause();
+            document.body.style.backgroundImage = "url('hallway2.jpg')";
+            showImage();
+        }
+
+        function showImage() {
+            document.getElementById("fjesBilde").src = "grave_encounters.png";
+            scream.play();
+            document.getElementById("overskrift").style.visibility = "visible";
+            document.getElementById("overskrift").innerHTML = "GAME OVER";
+            document.getElementById("overskrift").style.color = "red";
+            document.getElementById("overskrift").style.fontSize = "200%";
+            tekst.innerHTML = "<a href='https://hmauroy.github.io/'>Take me home </a>";
+            btnJa.style.visibility = "hidden";
+            btnNei.style.visibility = "hidden";
+        }
+
+    </script>
+    <style>
+        body {
+            background-color: #0f0c0c;
+            color: white;
+            background-image: url("headphones.png");
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        #btnJa {
+            visibility: hidden;
+        }
+        #btnNei {
+            visibility: hidden;
+        }
+        #innpakning {
+            width: 800px;
+            height: 600px;
+            margin: auto;
+            display: flex;
+        }
+        #tekstboks {
+            margin: auto;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        .red {
+            color: red;
+            font-weight: bolder;
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="innpakning">
+    <div id="tekstboks">
+
+        <h1 id="overskrift">Klikk <span id="test">teksten</span> for å <span class="red">spille...</span></h1>
+        <h2 id="underoverskrift">Headphones on!</h2>
+        <p id="tekst"></p>
+
+        <audio id="audioAmbient" loop="true">
+            <source src="horror-ambience-10.wav" type="audio/wav">
+            Your browser does not support the audio element.
+        </audio>
+
+        <audio id="audioScream">
+            <source src="scream.wav" type="audio/wav">
+            Your browser does not support the audio element.
+        </audio>
+        <audio id="audioHighHeels">
+            <source src="highheels.mp3" type="audio/mp3">
+            Your browser does not support the audio element.
+        </audio>
+        <audio id="audioDoor">
+            <source src="door-1.wav" type="audio/wav">
+            Your browser does not support the audio element.
+        </audio>
+
+        <button type="button" id="btnJa">Ja</button>
+        <button type="button" id="btnNei">Nei</button> <br>
+
+        <img src="" id="fjesBilde">
+
+    </div>
+
+</div>
+
+</body>
+</html>
