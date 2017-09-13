@@ -16,6 +16,7 @@
         var btnJa;
         var btnNei;
         var door;
+        var horse;
 
         function oppstart() {
             // Hovedprogramkode her...
@@ -23,6 +24,7 @@
             highHeels = document.getElementById("audioHighHeels");
             scream = document.getElementById("audioScream");
             door = document.getElementById("audioDoor");
+            horse = document.getElementById("audioHorse");
             tekst = document.getElementById("tekst");
             btnNei = document.getElementById("btnNei");
             btnJa = document.getElementById("btnJa");
@@ -87,11 +89,18 @@
             document.body.style.backgroundImage = "url('door.jpg')";
             tekst.innerHTML = "Du er ikke helt sikker på om du skal gå inn døren. <br> Vil du gå inn?";
             console.log("doorOpens");
+            updateButtons(unicornQuest);
+        }
+        function unicornQuest() {
+            door.pause();
+            horse.play();
+            console.log("unicornQuest");
+            document.getElementById("fjesBilde").src = "unicorn.jpg";
+            tekst.innerHTML = "En enhjørning venter på deg på andre siden av døren! <br> Vil du klappe den?";
             updateButtons(endGame);
-
         }
         function endGame() {
-            door.pause();
+            horse.pause();
             document.body.style.backgroundImage = "url('hallway2.jpg')";
             showImage();
         }
@@ -166,6 +175,10 @@
         </audio>
         <audio id="audioDoor">
             <source src="door-1.wav" type="audio/wav">
+            Your browser does not support the audio element.
+        </audio>
+        <audio id="audioHorse">
+            <source src="funnyHorse.wav" type="audio/wav">
             Your browser does not support the audio element.
         </audio>
 
