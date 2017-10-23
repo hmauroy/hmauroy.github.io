@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="https://hmauroy.github.io/8bitHenrik.png">
+    <meta name="author" content="Henrik Mauroy">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Amandas gaver</title>
+    <script>
+        window.onload = oppstart;
+
+        // Lager en assosiativ array (egentlig objekter)
+        var gaver = {
+            anneksverre: "natt1.jpg",
+            cath: "natt2.jpg",
+            jon: "natt3.jpg"
+
+        };
+
+        var funksjoner = [];
+
+        function oppstart() {
+            // Hovedprogramkode her...
+
+            // Lager alle bildene og Modalene fra array
+            for(var key in gaver) {
+                console.log(gaver[key]);
+                // Lager bildene
+                var nyDiv = document.createElement("div");
+                nyDiv.className = "boks";
+                nyDiv.id = key;   // Legger inn navnet til gavegiveren som id
+                nyDiv.returnKey = function() {
+                    return this.id;
+                };
+                nyDiv.style.backgroundImage = "url('" + gaver[key] + "')";
+                document.getElementById("innpakning").appendChild(nyDiv); // legger til diven inni 'innpakningen'
+
+                // Lager Modalene
+                var nyModal = document.createElement("div");    // lager selve Modalen som skal sprette opp
+                nyModal.className = "modal";
+                nyModal.id = key + "_modal"; // for eksempel jon_modal
+                nyModal.vis = function() {
+                    this.style.display = "block";   // gjør bildet synlig
+                };
+                document.getElementById("modalInnpakning").appendChild(nyModal); // legger til modalen inni modalinnpakningen
+
+                var nyClose = document.createElement("span");   // Lager lukke-krysset som lukker vinduet
+                nyClose.className = "close";
+                nyClose.id = key + "_close";    // for eksempel jon_close
+                nyClose.innerHTML = "×";
+                nyModal.appendChild(nyClose);    // legger lukkeknappen inni diven nyModal
+
+                var nyBilde = document.createElement("img");    // legger til img-tag
+                nyBilde.className = "modal-content";
+                nyBilde.id = key + "_img";      // for eksempel jon_img
+                nyBilde.src = gaver[key];
+                nyModal.appendChild(nyBilde);    // legger img-tag inni diven nyModal
+
+                var nyCaption = document.createElement("div");
+                nyCaption.className = "caption";
+                nyCaption.innerHTML = "Jeg har fått den av " + key;
+                nyModal.appendChild(nyCaption);  // legger caption-tekst inni diven nyModal
+
+                // Lager onclick-funksjonen som starter hver Modal
+                nyDiv.onclick = function() {
+                    console.log("Starter Modal tilhørende Div: " + this.id);
+                    document.getElementById(this.id + "_modal").style.display = "block";
+                };
+
+                // Lager lukke-funksjonen som lukker hver Modal
+                nyClose.onclick = function() {
+                    var parentId = this.parentNode.getAttribute("id");  // finner id for diven ett nivå over
+                    console.log("Lukker Modal tihørende Div: " + parentId);
+                    document.getElementById(parentId).style.display = "none";
+                }
+
+
+            }// End for(var key in gaver)
+
+
+        }// End oppstart()
+
+
+
+
+    </script>
+    <style>
+        body {
+            background-color: black;
+            font-family: "Century Gothic", sans-serif;
+
+        }
+        #footer {
+            position:relative;
+
+            height:20px;   /* Height of the footer */
+            width: 99%;
+            margin: auto;
+            font-size: 10px;
+            text-align: center;
+            color: white;
+
+        }
+        img {
+            border-radius: 15px;
+            border: solid;
+            border-color: white;
+            border-width: 5px;
+            -webkit-filter: grayscale(100%);
+            filter: grayscale(100%);
+            -webkit-transition: .3s ease-in-out;
+            transition: .3s ease-in-out;
+        }
+        a {
+            text-decoration: none;
+        }
+        img:hover {
+            border-color: #b4b4b4;
+            -webkit-filter: grayscale(0);
+            filter: grayscale(0);
+        }
+        .Aligner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #innpakning {
+            margin-top: 7%;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            width: 700px;
+            /*max-width: 70%;*/
+            justify-content: center;
+            /*border-style: solid;*/
+            /*border-color: white;*/
+            padding: 50px;
+        }
+        .boks {
+            margin: 5px;
+            padding: 5px;
+            border-radius: 10px;
+            width: 300px;
+            height: 168px;
+            background-size: cover;
+            border: solid;
+            border-color: white;
+            border-width: 5px;
+        }
+        .boks:hover {
+            cursor: pointer;
+        }
+
+
+        .overskrift {
+            text-align: center;
+            font-size: 50px;
+            font-weight: bold;
+            color: #ffffff;
+            width: 100%; /* tvinger frem linjeskift før neste flexbox */
+        }
+        #litenSkrift {
+            text-align: right;
+            font-size: 15px;
+        }
+
+        #youtube {
+            margin-top: 100px;
+        }
+
+
+        /* The Modal (background) */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            padding-top: 100px; /* Location of the box */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgb(0,0,0); /* Fallback color */
+            background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
+        }
+
+        /* Modal Content (image) */
+        .modal-content {
+            margin: auto;
+            margin-top: 10%;
+            display: block;
+            width: 80%;
+            max-width: 700px;
+            -webkit-filter: grayscale(0); /* tvinger gråfarge til å ikke skje ved img:hover */
+            filter: grayscale(0); /* tvinger gråfarge til å ikke skje ved img:hover */
+            border-color: white; /* tvinger border til å være hvit ved :hover */
+        }
+        .modal-content:hover {
+            border-color: white;    /* tvinger border til å være hvit selv ved hover */
+        }
+
+        /* Caption of Modal Image */
+        .caption {
+            margin: auto;
+            display: block;
+            width: 80%;
+            max-width: 700px;
+            text-align: center;
+            color: white;
+            padding: 10px 0;
+            height: 150px;
+        }
+
+        /* Add Animation */
+        .modal-content, #caption {
+            -webkit-animation-name: zoom;
+            -webkit-animation-duration: 0.6s;
+            animation-name: zoom;
+            animation-duration: 0.6s;
+        }
+
+        @-webkit-keyframes zoom {
+            from {-webkit-transform:scale(0)}
+            to {-webkit-transform:scale(1)}
+        }
+
+        @keyframes zoom {
+            from {transform:scale(0)}
+            to {transform:scale(1)}
+        }
+
+        /* The Close Button */
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #bbb;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* 100% Image Width on Smaller Screens */
+        @media only screen and (max-width: 700px){
+            .modal-content {
+                width: 100%;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="Aligner">
+
+    <div id="innpakning">
+        <div class="overskrift">
+            Tusen takk for gavene!
+            <div id="litenSkrift"> - Amanda Lorenthine &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </div>
+        </div>
+
+
+    </div>  <!-- Avslutter innpakning -->
+
+</div> <!-- Avslutter class="Aligner" -->
+
+<!-- Lager The Modal -->
+<div id="modalInnpakning">
+
+
+</div>
+
+</body>
+</html>
