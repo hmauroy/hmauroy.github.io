@@ -127,11 +127,7 @@
         a {
             text-decoration: none;
         }
-        img:hover {
-            border-color: #b4b4b4;
-            -webkit-filter: grayscale(0);
-            filter: grayscale(0);
-        }
+
         .Aligner {
             display: flex;
             align-items: center;
@@ -150,7 +146,7 @@
             padding: 50px;
         }
         .boks {
-            margin: 5px;
+            margin: 15px;
             padding: 5px;
             border-radius: 10px;
             width: 150px;
@@ -159,12 +155,17 @@
             border: solid;
             border-color: white;
             border-width: 5px;
+            -webkit-filter: grayscale(100%);
+            filter: grayscale(100%);
+            -webkit-transition: .3s ease-in-out;
+            transition: .3s ease-in-out;
         }
         .boks:hover {
-            cursor: pointer;
+            cursor: pointer;    /* endrer fasongen til musepekeren som er lik som når man trykker på link */
+            border-color: #b4b4b4;
+            -webkit-filter: grayscale(0);
+            filter: grayscale(0);
         }
-
-
         .overskrift {
             text-align: center;
             font-size: 50px;
@@ -198,7 +199,7 @@
             margin-top: 0;
             display: block;
             width: 80%;
-            max-width: 1200px;
+            max-width: 1000px;
             -webkit-filter: grayscale(0); /* tvinger gråfarge til å ikke skje ved img:hover */
             filter: grayscale(0); /* tvinger gråfarge til å ikke skje ved img:hover */
             border-color: white; /* tvinger border til å være hvit ved :hover */
