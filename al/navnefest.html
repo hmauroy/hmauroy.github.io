@@ -11,9 +11,10 @@
 
         // Lager en assosiativ array (egentlig objekter)
         var gaver = {
-            Guro: "guro.jpg",
+            Stine: "votter.jpg",
             bestemor_og_bestefar: "natt1.jpg",
             cath: "natt2.jpg",
+            Stine_og_Mikkel: "natt2.jpg",
             a: "natt1.jpg",
             b: "natt2.jpg",
             c: "natt1.jpg",
@@ -69,7 +70,7 @@
 
                 var nyCaption = document.createElement("div");
                 nyCaption.className = "caption";
-                nyCaption.innerHTML = "Jeg har fått den av " + key;
+                nyCaption.innerHTML = "Jeg har fått gaven av " + key;
                 nyModal.appendChild(nyCaption);  // legger caption-tekst inni diven nyModal
 
                 // Lager onclick-funksjonen som starter hver Modal
@@ -196,7 +197,7 @@
             margin-top: 0px;
             display: block;
             width: 80%;
-            max-width: 800px;
+            max-width: 1000px;
             -webkit-filter: grayscale(0); /* tvinger gråfarge til å ikke skje ved img:hover */
             filter: grayscale(0); /* tvinger gråfarge til å ikke skje ved img:hover */
             border-color: white; /* tvinger border til å være hvit ved :hover */
