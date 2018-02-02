@@ -1,15 +1,22 @@
-2017.08.28 11:31:03.372 Info   Starting JoyToKey Ver5.9
-2017.08.28 11:31:03.372 Info   ExeFile=D:\Cloud\1 Frogn\Fag\TekForsk\ROV\openROV\JoyToKey_en\JoyToKey.exe
-2017.08.28 11:31:03.372 Info   ConfigDir=D:\Cloud\1 Frogn\Fag\TekForsk\ROV\openROV\JoyToKey_en\
-2017.08.28 11:31:03.372 Info   IniFile=D:\Cloud\1 Frogn\Fag\TekForsk\ROV\openROV\JoyToKey_en\JoyToKey.ini
-2017.08.28 11:31:03.372 Info   Windows Version = 6.1
-2017.08.28 11:31:03.373 Info   Loaded VistaAPI.dll (Utils\Utils.cpp#226)
-2017.08.28 11:31:03.373 Info   LicenseKey "" is not valid
-2017.08.28 11:31:03.424 Info   Loading XInput1_3.dll (Joystick.cpp#128)
-2017.08.28 11:31:03.425 Error  Could not load XInput1_3.dll. Trying to load XInput1_4.dll... (Joystick.cpp#132)
-2017.08.28 11:31:03.426 Error  Could not load XInput1_4.dll (Joystick.cpp#136)
-2017.08.28 11:31:03.441 Info   0 joysticks are detected (Joystick.cpp#168)
-2017.08.28 11:31:03.441 Info   ConfigDir=D:\Cloud\1 Frogn\Fag\TekForsk\ROV\openROV\JoyToKey_en\*.cfg (ConfigFileManager.cpp#43)
-2017.08.28 11:31:03.443 Info   Failed to find AppLink.dat (AppLink\AppLinkManager.cpp#32)
-2017.08.28 11:31:03.451 Info   TimerInit: Initializing timer with x1 speed mode (interval = 16 msec)
-2017.08.28 12:26:12.933 Info   Application terminated (Utils\LogFile.cpp#20)
+2018.01.31 14:11:41.955 Info   Starting JoyToKey Ver5.9
+2018.01.31 14:11:41.955 Info   ExeFile=D:\Cloud\1 Frogn\Fag\TekForsk\ROV\openROV\JoyToKey_en\JoyToKey.exe
+2018.01.31 14:11:41.955 Info   ConfigDir=D:\Cloud\1 Frogn\Fag\TekForsk\ROV\openROV\JoyToKey_en\
+2018.01.31 14:11:41.955 Info   IniFile=D:\Cloud\1 Frogn\Fag\TekForsk\ROV\openROV\JoyToKey_en\JoyToKey.ini
+2018.01.31 14:11:41.955 Info   Windows Version = 6.1
+2018.01.31 14:11:41.982 Info   Loaded VistaAPI.dll (Utils\Utils.cpp#226)
+2018.01.31 14:11:41.992 Info   LicenseKey "" is not valid
+2018.01.31 14:11:42.084 Info   Loading XInput1_3.dll (Joystick.cpp#128)
+2018.01.31 14:11:42.085 Error  Could not load XInput1_3.dll. Trying to load XInput1_4.dll... (Joystick.cpp#132)
+2018.01.31 14:11:42.085 Error  Could not load XInput1_4.dll (Joystick.cpp#136)
+2018.01.31 14:11:42.096 Info   0 joysticks are detected (Joystick.cpp#168)
+2018.01.31 14:11:42.096 Info   ConfigDir=D:\Cloud\1 Frogn\Fag\TekForsk\ROV\openROV\JoyToKey_en\*.cfg (ConfigFileManager.cpp#43)
+2018.01.31 14:11:42.107 Info   Failed to find AppLink.dat (AppLink\AppLinkManager.cpp#32)
+2018.01.31 14:11:42.122 Info   TimerInit: Initializing timer with x1 speed mode (interval = 16 msec)
+2018.01.31 14:16:28.986 Info   Received PBT_APMSUSPEND: Disabling a timer... (Main.cpp#420)
+2018.01.31 14:30:24.523 Info   Received PBT_APMRESUMESUSPEND: Reinitializing joysticks... (Main.cpp#425)
+2018.01.31 14:30:24.523 Info   Loading XInput1_3.dll (Joystick.cpp#128)
+2018.01.31 14:30:24.526 Error  Could not load XInput1_3.dll. Trying to load XInput1_4.dll... (Joystick.cpp#132)
+2018.01.31 14:30:24.527 Error  Could not load XInput1_4.dll (Joystick.cpp#136)
+2018.01.31 14:30:24.641 Info   0 joysticks are detected (Joystick.cpp#168)
+2018.01.31 14:30:24.641 Info   TimerInit: Initializing timer with x1 speed mode (interval = 16 msec)
+31.01.2018 14:32:21 Info   Application terminated (Utils\LogFile.cpp#20)

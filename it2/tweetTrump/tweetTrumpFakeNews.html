@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Sebastian Bjørvik">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Fake News</title>
+    <script>
+        window.onload = oppstart;
+
+        var taster = {OPP: 38, NED: 40, VENSTRE: 37, HOEYRE: 39, SPACE: 32};
+
+        var kanon;
+        var maal;
+        var kuler = [];
+        var rotasjon = 0;
+        var fart = 5;
+        var poeng = 0;
+
+        function oppstart() {
+            // Hovedprogramkode her...
+            document.onkeydown = tastTrykket;
+            kanon = document.getElementById("kanon");
+            maal = document.getElementById("maal");
+            setInterval(flyttKuler, 10);
+            setTimeout(flyttMaal, 1); //setter i gang bevegelse med en gang så ikke målet står stille i 10 sek først
+            setInterval(flyttMaal, 5000);
+
+            flyttMaal();
+        }
+        function tastTrykket(evt) {
+            document.onkeydown = tastTrykket;
+            if (evt.keyCode === taster.OPP) {
+                rotasjon -= 5;
+                rotasjon = Math.max(-90, rotasjon);
+                kanon.style.transform = "rotate(" + rotasjon + "deg)";
+            }
+            else if (evt.keyCode === taster.NED) {
+                rotasjon += 5;
+                rotasjon = Math.min(0, rotasjon);
+                kanon.style.transform = "rotate(" + rotasjon + "deg)";
+            }
+            else if (evt.keyCode === taster.VENSTRE) {
+                fart -= 1;
+                fart = Math.max(0, fart);
+            }
+            else if (evt.keyCode === taster.HOEYRE) {
+                fart += 1;
+                fart = Math.min(25, fart);
+            }
+            else if (evt.keyCode === taster.SPACE) {
+                 var k = document.createElement("div");
+                 k.className = "kule";
+
+                var a = rotasjon * Math.PI / 180; //vinkel i radianer
+
+                var x = kanon.getBoundingClientRect().left +
+                        kanon.getBoundingClientRect().width / 2;
+                var y = kanon.getBoundingClientRect().top +
+                    kanon.getBoundingClientRect().height / 2;
+
+                k.style.left = x + "px";
+                k.style.top = y + "px";
+
+                kuler[kuler.length] = {
+                    kule: k, top: y, left: x,
+                    dx: fart * Math.cos(a),
+                    dy: fart * Math.sin(a),
+                    ddy: 0.1
+                };
+
+                document.getElementById("kuler").appendChild(k);
+
+                var lyd = new Audio("fakeNews.mp3");
+                lyd.play();
+            }
+        }
+
+        function flyttMaal() {
+            var tilfeldigX = Math.floor((Math.random()*window.innerWidth));
+            if(tilfeldigX < 200) {
+                tilfeldigX += 200;
+            }
+            var tilfeldigY = Math.floor((Math.random()*window.innerHeight));
+            if(tilfeldigY > window.innerHeight-100) {
+                tilfeldigY -= 200;
+            }
+            maal.style.left = tilfeldigX + "px";
+            maal.style.top = tilfeldigY + "px";
+            /*var tilfeldigFart = Math.random()*5;
+            maal.style.transition = tilfeldigFart + "s";*/
+        }
+        function flyttKuler() {
+            for (var i = 0; i < kuler.length; i++) {
+                if (kuler[i] === null) {
+                    continue;
+                }
+                kuler[i].top += kuler[i].dy;
+                kuler[i].dy += kuler[i].ddy;
+                kuler[i].kule.style.top = kuler[i].top + "px";
+
+                kuler[i].left += kuler[i].dx;
+                kuler[i].kule.style.left = kuler[i].left + "px";
+
+                if (kuler[i].top > window.innerHeight || kuler[i].left >
+                window.innerWidth) {
+                    poeng--;
+
+                    document.getElementById("kuler").removeChild(kuler[i].kule);
+                    kuler[i] = null;
+                }
+                else if (kollisjon(kuler[i].kule) == true) {
+                    poeng++;
+
+                    document.getElementById("kuler").removeChild(kuler[i].kule);
+                    kuler[i] = null;
+                    var treffLyd = new Audio("splat.mp3");
+                    treffLyd.play();
+                }
+            }
+            document.getElementById("idRot").innerHTML = rotasjon;
+            document.getElementById("idFart").innerHTML = fart;
+            document.getElementById("idPoeng").innerHTML = poeng;
+            document.getElementById("idPoeng").style.color = "red";
+            document.getElementById("idPoeng").style.fontWeight = "bold";
+
+        }
+        function kollisjon(kule) {
+            var b1rect = maal.getBoundingClientRect();
+            var b2rect = kule.getBoundingClientRect();
+
+            if (b1rect.left <= b2rect.left + b2rect.width &&
+                b2rect.left <= b2rect.left + b1rect.width &&
+                b1rect.top <= b2rect.top + b2rect.height &&
+                b2rect.top <= b1rect.top + b1rect.height) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+    </script>
+    <style>
+        #kanon {
+            background-image: url("trump.png");
+            background-size: 150px 150px;
+            background-repeat: no-repeat;
+            position: fixed;
+            bottom: 0;
+            left: 10px;
+            width: 150px;
+            height: 150px;
+            z-index: 1;
+        }
+        .kule {
+            background-image: url("tweet.png");
+            background-size: 40px 40px;
+            background-repeat: no-repeat;
+            position: fixed;
+            width: 40px;
+            height: 40px;
+        }
+        #info {
+            position: fixed;
+            top: 0;
+            left: 0;
+            font-size: 200%;
+        }
+        #maal {
+            background-image: url("fakeNews.png");
+            background-size: 100px 100px;
+            background-repeat: no-repeat;
+            position: fixed;
+            width: 100px;
+            height: 100px;
+            transition: 5s linear;
+        }
+    </style>
+</head>
+<body>
+<div id="info">
+    Rotasjon <span id="idRot"></span> <br>
+    Fart <span id="idFart"></span> <br>
+    Poeng <span id="idPoeng"></span>
+</div>
+<div id="kanon"></div>
+<div id="maal"></div>
+<div id="kuler"></div>
+</body>
+</html>
