@@ -11,25 +11,63 @@
         var taster = {OPP: 38, NED: 40, VENSTRE: 37, HOEYRE: 39, SPACE: 32};
 
         var kanon;
-        var maal;
+        var maal = [];  // lager array til alle målene
         var kuler = [];
         var rotasjon = 0;
-        var fart = 5;
+        var fart = 10;
         var poeng = 0;
+        var lagMaalIntervall = 5000;    // tiden mellom hvert nye mål
+        var lagMaalOppstart;    // håndtak for å sette intervallet
+        var antallMaal = 0;
+        var antBlink = 0;
+        var levelUPdiv;
+        var deltaIntervall = 1000;
+        antLevelUp = 0;
+        var spillVinduY;
+        var spillVinduX;
 
         function oppstart() {
             // Hovedprogramkode her...
             document.onkeydown = tastTrykket;
             kanon = document.getElementById("kanon");
-            maal = document.getElementById("maal");
+            levelUPdiv = document.getElementById("levelUPdiv"); // en usynlig div for å posisjonere levelUP!-teksten
+            spillVinduY = window.innerHeight;
+            spillVinduX = window.innerWidth;
+            lagMaal();  // lager det første målet
             setInterval(flyttKuler, 10);
             setTimeout(flyttMaal, 1); //setter i gang bevegelse med en gang så ikke målet står stille i 10 sek først
-            setInterval(flyttMaal, 5000);
+            setInterval(flyttMaal, 1000);
+            lagMaalOppstart = setInterval(lagMaal,lagMaalIntervall);
+            //blinkLevelUp();
+        }
+        function lagMaal() {
+            if(antallMaal <= 10) {  // kun lov å lage nye mål hvis det er mindre enn 10 mål på skjermen
+                var m = document.createElement("div");
+                m.className = "maal";
+                maal[maal.length] = {
+                    maalet: m
+                };
+                // lager tilfeldig posisjon for målet
+                var tilfeldigX = Math.floor((Math.random()*window.innerWidth));
+                if(tilfeldigX < 200) {
+                    tilfeldigX += 200;
+                }
+                var tilfeldigY = Math.floor((Math.random()*window.innerHeight));
+                if(tilfeldigY > window.innerHeight-100) {
+                    tilfeldigY -= 200;
+                }
 
-            flyttMaal();
+                m.style.left = tilfeldigX + "px";
+                m.style.top = tilfeldigY + "px";
+                document.body.appendChild(m);
+                antallMaal++;
+                flyttMaal();
+            }
+
         }
         function tastTrykket(evt) {
             document.onkeydown = tastTrykket;
+            //(evt.keyCode);
             if (evt.keyCode === taster.OPP) {
                 rotasjon -= 5;
                 rotasjon = Math.max(-90, rotasjon);
@@ -77,18 +115,27 @@
         }
 
         function flyttMaal() {
-            var tilfeldigX = Math.floor((Math.random()*window.innerWidth));
-            if(tilfeldigX < 200) {
-                tilfeldigX += 200;
+            //console.log("inni flyttMaal");
+            for (var i = 0; i < maal.length; i++) {
+                if (maal[i] === null) {
+                    continue;
+                }
+                else {
+                    // lag håndtak til målet man tar tak i maal[i].maalet
+                    var detteMaalet = maal[i].maalet;
+                    //console.log(detteMaalet);
+                    var tilfeldigX = Math.floor((Math.random()*window.innerWidth));
+                    if(tilfeldigX < 200) {
+                        tilfeldigX += 200;
+                    }
+                    var tilfeldigY = Math.floor((Math.random()*window.innerHeight));
+                    if(tilfeldigY > window.innerHeight-100) {
+                        tilfeldigY -= 200;
+                    }
+                    detteMaalet.style.left = tilfeldigX + "px";
+                    detteMaalet.style.top = tilfeldigY + "px";
+                }
             }
-            var tilfeldigY = Math.floor((Math.random()*window.innerHeight));
-            if(tilfeldigY > window.innerHeight-100) {
-                tilfeldigY -= 200;
-            }
-            maal.style.left = tilfeldigX + "px";
-            maal.style.top = tilfeldigY + "px";
-            /*var tilfeldigFart = Math.random()*5;
-            maal.style.transition = tilfeldigFart + "s";*/
         }
         function flyttKuler() {
             for (var i = 0; i < kuler.length; i++) {
@@ -107,13 +154,28 @@
                     poeng--;
 
                     document.getElementById("kuler").removeChild(kuler[i].kule);
-                    kuler[i] = null;
+                    kuler.splice(i,1); // fjerner array-plassen
                 }
-                else if (kollisjon(kuler[i].kule) == true) {
+                else if (kollisjon(kuler[i].kule) === true) {
                     poeng++;
+                    if(poeng % 5 === 0 && poeng > 0 && antLevelUp <= 7) {  // for hvert 5. poeng økes vanskelighetsgraden
+                        antLevelUp++;
+                        if(antLevelUp === 5) {
+                            deltaIntervall = 200;
+                        }
+                        var levelUp = new Audio('listenToThis.mp3');
+                        levelUp.play();
+                        setTimeout(blinkLevelUp,500);
+                        lagMaalIntervall -= deltaIntervall;
+                        if(lagMaalIntervall <= 0) {
+                            lagMaalIntervall = 200;
+                        }
+                        clearInterval(lagMaalOppstart); // stanser det forrige intervallet
+                        lagMaalOppstart = setInterval(lagMaal,lagMaalIntervall);    // starter nytt intervall
+                    }
 
                     document.getElementById("kuler").removeChild(kuler[i].kule);
-                    kuler[i] = null;
+                    kuler.splice(i,1); // fjerner array-plassen
                     var treffLyd = new Audio("splat.mp3");
                     treffLyd.play();
                 }
@@ -126,31 +188,77 @@
 
         }
         function kollisjon(kule) {
-            var b1rect = maal.getBoundingClientRect();
-            var b2rect = kule.getBoundingClientRect();
+            // må gå gjennom alle målene for å se om man treffer ett av dem
+            for(var j=0; j<maal.length;j++) {
+                //console.log(j);
+                if (maal[j] === null) {
+                    //console.log("===null");
+                    continue;
+                }
+                else {
+                    var b1rect = maal[j].maalet.getBoundingClientRect();
+                    var b2rect = kule.getBoundingClientRect();
 
-            if (b1rect.left <= b2rect.left + b2rect.width &&
-                b2rect.left <= b2rect.left + b1rect.width &&
-                b1rect.top <= b2rect.top + b2rect.height &&
-                b2rect.top <= b1rect.top + b1rect.height) {
-                return true;
+                    if (b1rect.left <= b2rect.left + b2rect.width &&
+                        b2rect.left <= b2rect.left + b1rect.width &&
+                        b1rect.top <= b2rect.top + b2rect.height &&
+                        b2rect.top <= b1rect.top + b1rect.height) {
+                        document.body.removeChild(maal[j].maalet); // sletter målet når det blir truffet
+                        maal.splice(j,1); // fjerner array-plassen
+                        antallMaal--;   // trekker en fra antall mål totalt
+                        return true;
+                    }
+                    else {
+                        // ikke gjør noe
+                    }
+                }
             }
-            else {
-                return false;
-            }
+            return false;   // returner false hvis ikke noe ble truffet
+        }
+
+        function blinkLevelUp() {
+            antBlink = 0;
+            var levelTekst = document.createElement("div");
+            levelTekst.innerHTML = "Level UP!";
+            levelTekst.style.fontWeight = "bold";
+            levelTekst.style.fontSize = "1000%";
+            levelTekst.style.fontFamily = "monospace";
+            levelTekst.style.color = "red";
+            levelTekst.style.margin = "auto";
+            levelTekst.style.visibility = "visible";
+            levelUPdiv.appendChild(levelTekst);
+            levelUPdiv.style.height = (0.7*spillVinduY) + "px";
+            levelBlink = setInterval(function() {
+                // det skal bare blinke 10 ganger
+                if(antBlink >= 10) {
+                    levelUPdiv.removeChild(levelTekst);
+                    stoppblinking();
+                }
+                // sett klassen hidden
+                if(levelTekst.style.visibility === "visible") {
+                    antBlink++;
+                    levelTekst.style.visibility = "hidden";
+                }
+                else if(levelTekst.style.visibility === "hidden") {
+                    levelTekst.style.visibility = "visible";
+                }
+            },50);
+        }
+        function stoppblinking() {
+            clearInterval(levelBlink);
         }
 
     </script>
     <style>
         #kanon {
-            background-image: url("trump.png");
-            background-size: 150px 150px;
+            background-image: url("trump_small.png");
             background-repeat: no-repeat;
+            background-size: cover;
             position: fixed;
             bottom: 0;
             left: 10px;
-            width: 150px;
-            height: 150px;
+            width: 250px;
+            height: 200px;
             z-index: 1;
         }
         .kule {
@@ -167,7 +275,7 @@
             left: 0;
             font-size: 200%;
         }
-        #maal {
+        .maal {
             background-image: url("fakeNews.png");
             background-size: 100px 100px;
             background-repeat: no-repeat;
@@ -175,6 +283,12 @@
             width: 100px;
             height: 100px;
             transition: 5s linear;
+        }
+        #levelUPdiv {
+            width: 70%;
+            z-index: 99;
+            margin: auto;
+            display: flex;
         }
     </style>
 </head>
@@ -185,7 +299,8 @@
     Poeng <span id="idPoeng"></span>
 </div>
 <div id="kanon"></div>
-<div id="maal"></div>
+<!--div id="maal1" class="maal"></div-->
 <div id="kuler"></div>
+<div id="levelUPdiv"></div>
 </body>
 </html>
