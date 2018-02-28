@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="https://hmauroy.github.io/8bitHenrik.png">
+    <meta name="author" content="Henrik Mauroy">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Counts in any given base number</title>
+    <script>
+        window.onload = oppstart;
+
+        var arr = [0,0,0,0,0,0];
+        var base = 2;
+        var teller = 0;
+
+        function oppstart() {
+            // Hovedprogramkode her...
+            //count(2);   // counts until bit 2 is filled up
+            teller++;
+            console.log(teller + " " + arr);
+            runBit(arr.length-1);  // counts the last bit
+        }
+        function runBit(n) {
+            while(arr[n] < base-1) {
+                arr[n] += 1;
+                teller++;
+                console.log(teller + " " + arr);
+            }
+            incrementBit(n-1);
+        }
+        function incrementBit(n) {
+            if(n<0){   // stops when the last bit is at the highest number
+                console.log("Stopping bacause n=-1 and we reached maximum values for all bits.");
+            }
+            else if(arr[n] === base-1) {
+                incrementBit(n-1);
+            }
+            else {
+                emptyBits(n + 1); // clears the array fron n+1
+                arr[n] += 1;
+                teller++;
+                console.log(teller + " " + arr);
+                runBit(arr.length - 1);   // recursive calling
+            }
+        }
+        function emptyBits(from) {  // sets all the bits to zero
+            for(var j=from; j<arr.length; j++) {
+                //console.log("Clears the remaining bits");
+                arr[j] = 0;
+            }
+        }
+
+
+
+    </script>
+    <style>
+
+    </style>
+</head>
+<body>
+<h1>Check the console!</h1>
+
+</body>
+</html>
