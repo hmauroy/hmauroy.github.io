@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="https://hmauroy.github.io/8bitHenrik.png">
+    <meta name="author" content="Henrik Mauroy">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hvor mange uker gammel er Amanda?</title>
+    <script>
+        window.onload = oppstart;
+
+        var d = new Date();
+        var dag = 28;
+        var mnd = 5;
+        var aar = 2017;
+        var maidager = 3;
+        var months = [31,28,31,30,31,30,31,31,30,31,30,31];
+        var ant_maaneder = 0;
+        var ant_aar = 0;
+        var ant_dager = maidager;   // starter tellingen ved å legge til dagene i mai
+        var ant_uker = 0;
+        var rest = 0;
+
+        var uker;   // håndtak for teksten
+        var dager;
+
+
+        function oppstart() {
+            // Hovedprogramkode her...
+            uker = document.getElementById("uker");
+            dager = document.getElementById("dager");
+            console.log(d.getDate() + "/" + d.getMonth() + "-" + d.getFullYear());
+
+            // legger sammen alle dager som er levd frem til den aktuelle måneden man er i
+            if(d.getFullYear() === aar) { // Hvis det er samme året
+                ant_maaneder = d.getMonth() - mnd;
+                // legger sammen alle dager
+                for(var i=mnd; i<d.getMonth(); i++) {
+                    ant_dager += months[i];
+                }
+                console.log("ant_dager: " + ant_dager);
+                ant_uker = Math.floor(ant_dager / 7);
+                rest = ant_dager % 7;   // finner hvor mange dager som blir igjen etter delestykket
+                console.log(ant_uker + " uker og " + rest + " dager");
+                uker.innerHTML = ant_uker + " uker";
+                dager.innerHTML =  "og " + rest + " dager";
+            }
+            else {
+                ant_aar = d.getFullYear() - aar;    // finner antall år
+                if(ant_aar <= 1) {  // dersom det kun er ett år siden
+                    ant_maaneder = 12-mnd + d.getMonth();   // legger sammen alle måneder i fødselsåret
+                    console.log("ant_maaneder: " + ant_maaneder);
+                    // legger sammen alle dager i 2017
+                    for(var j=mnd; j<12; j++) {
+                        ant_dager += months[j];
+                    }
+                    // legger sammen alle dager i det påfølgende året
+                    for(var k=0; k<d.getMonth(); k++) {
+                        ant_dager += months[k];
+                    }
+                    // legger sammen alle dager i denne måneden vi er i
+                    ant_dager += d.getDate();
+                    console.log("ant_dager: " + ant_dager);
+                    ant_uker = Math.floor(ant_dager / 7);
+                    rest = ant_dager % 7;   // finner hvor mange dager som blir igjen etter delestykket
+                    console.log(ant_uker + " uker og " + rest + " dager");
+                    uker.innerHTML = ant_uker + " uker";
+                    dager.innerHTML =  "og " + rest + " dager";
+                }
+                else {
+                    // legger sammen alle dager i fødselsåret
+                    for(var m=mnd; m<12; m++) {
+                        ant_dager += months[m];
+                    }
+                    // legger sammen alle dager i det påfølgende året
+                    for(var n=0; n<d.getMonth(); n++) {
+                        ant_dager += months[n];
+                    }
+                    ant_dager += ant_aar * 365; // legger til de resterende årene tar ikke høyde for skuddår
+                    ant_uker = Math.floor(ant_dager / 7);
+                    rest = ant_dager % 7;   // finner hvor mange dager som blir igjen etter delestykket
+                    console.log(ant_uker + " uker og " + rest + " dager");
+                    uker.innerHTML = ant_uker + " uker";
+                    dager.innerHTML =  "og " + rest + " dager";
+                }
+            }
+
+
+
+        }
+
+    </script>
+    <style>
+        @font-face {
+            font-family: "Zig Computer";
+            src: url("zigComputer.ttf");
+        }
+        .innpakning {
+            margin-top: 10%;
+            margin-left: auto;
+            margin-right: auto;
+            background-color: rgba(240,128,128,1);
+            width: 30%;
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+        #uker {
+            margin: auto;
+            font-family: "Zig Computer";
+            font-size: 500%;
+        }
+        #dager {
+            margin: auto;
+            font-family: "Zig Computer";
+            font-size: 100%;
+        }
+
+
+    </style>
+</head>
+<body>
+<div class="innpakning">
+    <div id="uker"></div>
+    <div id="dager"></div>
+</div>
+</body>
+</html>
