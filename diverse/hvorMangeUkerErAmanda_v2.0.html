@@ -117,35 +117,42 @@
                     console.log(ant_uker + " uker og " + rest + " dager");
                     uker.innerHTML = ant_uker + " uker";
                     dager.innerHTML =  "og " + rest + " dager";
+                    uker.style.fontSize = "365%";
                     break;
                 case "days":
                     uker.innerHTML = ant_dager + " dager";
                     dager.innerHTML = "";
+                    uker.style.fontSize = "365%";
                     break;
                 case "hours":
                     var hours = ant_dager * 24;
                     uker.innerHTML = hours + " timer";
                     dager.innerHTML = "";
+                    uker.style.fontSize = "340%";
                     break;
                 case "minutes":
                     var minutes = ant_dager * 24 * 60;
                     uker.innerHTML = minutes + " minutter";
+                    uker.style.fontSize = "300%";
                     dager.innerHTML = "";
                     break;
                 case "seconds":
                     var seconds = ant_dager * 24 * 3600;
                     uker.innerHTML = seconds + " sekunder";
+                    uker.style.fontSize = "300%";
                     dager.innerHTML = "";
                     break;
                 case "years":
                     var years = ant_dager/365;
                     uker.innerHTML = years.toFixed(2) + " år";
                     dager.innerHTML = "";
+                    uker.style.fontSize = "365%";
                     break;
                 case "months":
                     var months = ant_dager/365 * 12;
                     uker.innerHTML = months.toFixed(0) + " måneder";
                     dager.innerHTML = "";
+                    uker.style.fontSize = "365%";
                     break;
 
             }
