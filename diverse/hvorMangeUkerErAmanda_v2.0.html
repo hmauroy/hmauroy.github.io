@@ -21,15 +21,20 @@
         var ant_uker = 0;
         var rest = 0;
 
-        var uker;   // håndtak for teksten
+        var uker;   // håndtak for grafikken
         var dager;
+        var innpakning;
+        var oldColor = "rgba(45,224,94,1)";
+        var newColor = "rgba(224,133,122,1)";
 
 
         function oppstart() {
             // Hovedprogramkode her...
             uker = document.getElementById("uker");
             dager = document.getElementById("dager");
+            innpakning = document.getElementById("innpakning");
             console.log(d.getDate() + "/" + d.getMonth() + "-" + d.getFullYear());
+            innpakning.ondblclick = byttFarge;
 
             // legger sammen alle dager som er levd frem til den aktuelle måneden man er i
             if(d.getFullYear() === aar) { // Hvis det er samme året
@@ -86,7 +91,13 @@
             }
 
 
+        } // End oppstart()
 
+        function byttFarge() {
+            var bufferColor = oldColor;
+            oldColor = newColor;    // switch colors
+            newColor = bufferColor;
+            innpakning.style.backgroundColor=newColor;
         }
 
     </script>
@@ -98,11 +109,12 @@
             font-family: "Zig Computer";
             src: url("zigComputer.ttf");
         }
-        .innpakning {
+        #innpakning {
             margin-top: 20%;
             margin-left: auto;
             margin-right: auto;
-            background-color: rgba(240,128,128,1);
+            background-color: rgba(240,128,128,1); /* Original color */
+            background-color: rgba(224,133,122,1); /* Color of Lorenthine */
             width: 100%;
             height: 200px;
             display: flex;
@@ -125,7 +137,7 @@
     </style>
 </head>
 <body>
-<div class="innpakning">
+<div id="innpakning">
     <div id="uker"></div>
     <div id="dager"></div>
 </div>
