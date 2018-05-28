@@ -105,7 +105,7 @@
         }
         function switchFormat() {
             formatTeller++;
-            if(formatTeller > outputFormat.length) {
+            if(formatTeller >= outputFormat.length) {
                 formatTeller = 0;
             }
             console.log("formatTeller: " + formatTeller);
