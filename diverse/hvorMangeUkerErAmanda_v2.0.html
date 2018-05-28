@@ -27,6 +27,9 @@
         var oldColor = "rgba(45,224,94,1)";
         var newColor = "rgba(224,133,122,1)";
 
+        var outputFormat = ["weeks","days","hours","minutes","seconds","years","months"];   // weeks, days, hours, minutes, years, months
+        var formatTeller = 0;
+
 
         function oppstart() {
             // Hovedprogramkode her...
@@ -98,6 +101,55 @@
             oldColor = newColor;    // switch colors
             newColor = bufferColor;
             innpakning.style.backgroundColor=newColor;
+            switchFormat();
+        }
+        function switchFormat() {
+            formatTeller++;
+            if(formatTeller > outputFormat.length) {
+                formatTeller = 0;
+            }
+            console.log("formatTeller: " + formatTeller);
+            console.log("outputformat: " + outputFormat[formatTeller]);
+            switch(outputFormat[formatTeller]) {
+                case "weeks":
+                    ant_uker = Math.floor(ant_dager / 7);
+                    rest = ant_dager % 7;   // finner hvor mange dager som blir igjen etter delestykket
+                    console.log(ant_uker + " uker og " + rest + " dager");
+                    uker.innerHTML = ant_uker + " uker";
+                    dager.innerHTML =  "og " + rest + " dager";
+                    break;
+                case "days":
+                    uker.innerHTML = ant_dager + " dager";
+                    dager.innerHTML = "";
+                    break;
+                case "hours":
+                    var hours = ant_dager * 24;
+                    uker.innerHTML = hours + " timer";
+                    dager.innerHTML = "";
+                    break;
+                case "minutes":
+                    var minutes = ant_dager * 24 * 60;
+                    uker.innerHTML = minutes + " minutter";
+                    dager.innerHTML = "";
+                    break;
+                case "seconds":
+                    var seconds = ant_dager * 24 * 3600;
+                    uker.innerHTML = seconds + " sekunder";
+                    dager.innerHTML = "";
+                    break;
+                case "years":
+                    var years = ant_dager/365;
+                    uker.innerHTML = years.toFixed(2) + " år";
+                    dager.innerHTML = "";
+                    break;
+                case "months":
+                    var months = ant_dager/365 * 12;
+                    uker.innerHTML = months.toFixed(0) + " måneder";
+                    dager.innerHTML = "";
+                    break;
+
+            }
+
         }
 
     </script>
