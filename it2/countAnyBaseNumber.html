@@ -9,13 +9,21 @@
     <script>
         window.onload = oppstart;
 
-        var arr = [0,0,0,0,0,0];
+        var arr = [0,0,0,0,0,0,0,0];
         var base = 2;
-        var teller = 0;
+        var teller = -1;
+        var baseNumbers = [2,3,4,5,6,7,8,9,10];
 
         function oppstart() {
             // Hovedprogramkode her...
-            //count(2);   // counts until bit 2 is filled up
+            // create menu
+            lagMeny();
+            document.getElementById("btnReg").onclick=startCounting;
+        }
+        function startCounting() {
+            teller = -1;
+            base = parseInt(document.getElementById("selMeny").value);
+            console.log("Selected base is: " + base);
             teller++;
             console.log(teller + " " + arr);
             runBit(arr.length-1);  // counts the last bit
@@ -49,16 +57,39 @@
                 arr[j] = 0;
             }
         }
+        function lagMeny() {
+            for (var i=0; i<baseNumbers.length; i++) {
+                var valg = document.createElement("option");
+                valg.innerHTML = baseNumbers[i];
+                valg.value = baseNumbers[i];
+                document.getElementById("selMeny").appendChild(valg);
+            }
+        }
 
 
 
     </script>
     <style>
+        @font-face {
+            font-family: "Zig Computer";
+            src: url("zigComputer.ttf");
+        }
+        body {
+            font-family: "Zig Computer";
+        }
 
     </style>
 </head>
 <body>
-<h1>Check the console!</h1>
+<h1>8-bit counting</h1>
+<h2>Check the console for results!</h2>
+
+Select a base <select id="selMeny"> </select>
+
+<br>
+
+<button type="button" id="btnReg">Start counting!</button>
+
 
 </body>
 </html>
