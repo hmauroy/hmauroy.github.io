@@ -37,7 +37,7 @@
             dager = document.getElementById("dager");
             innpakning = document.getElementById("innpakning");
             console.log(d.getDate() + "/" + d.getMonth() + "-" + d.getFullYear());
-            innpakning.ondblclick = byttFarge;
+            document.ondblclick = byttFarge;
 
             // legger sammen alle dager som er levd frem til den aktuelle måneden man er i
             if(d.getFullYear() === aar) { // Hvis det er samme året
