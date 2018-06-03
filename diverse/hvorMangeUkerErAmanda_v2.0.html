@@ -126,18 +126,25 @@
                     break;
                 case "hours":
                     var hours = ant_dager * 24;
+                    hours += d.getHours();
+                    //console.log("antall timer: " + hours);
                     uker.innerHTML = hours + " timer";
                     dager.innerHTML = "";
                     uker.style.fontSize = "340%";
                     break;
                 case "minutes":
                     var minutes = ant_dager * 24 * 60;
+                    minutes += d.getHours()*60;
+                    minutes += d.getMinutes();
                     uker.innerHTML = minutes + " minutter";
                     uker.style.fontSize = "300%";
                     dager.innerHTML = "";
                     break;
                 case "seconds":
                     var seconds = ant_dager * 24 * 3600;
+                    seconds += d.getHours()*3600;
+                    seconds += d.getMinutes()*60;
+                    seconds += d.getSeconds();
                     uker.innerHTML = seconds + " sekunder";
                     uker.style.fontSize = "300%";
                     dager.innerHTML = "";
