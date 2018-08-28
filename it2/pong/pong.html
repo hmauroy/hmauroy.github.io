@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Henrik Mauroy">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pong!</title>
+    <style>
+        @font-face {
+            font-family: 'Zig Computer';
+            src: url('zigComputer.ttf');
+        }
+        body {
+            font-family: "Zig Computer";
+        }
+        .innpakning {
+            width: 70%;
+            margin: auto;
+            display: flex;
+            flex-direction: column;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        #minCanvas {
+            margin: auto;
+        }
+        #overskrift {
+            min-width: 52%;  /* fyller 80% av innpakning */
+            font-size: 150%;
+            margin: auto;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+        #player1 {
+            border: none;
+        }
+        #player2 {
+            border: none;
+        }
+        #midtTekst {
+            font-size: 200%;
+        }
+
+    </style>
+
+    <script type="text/javascript" src="pongfunksjoner.js"></script>
+</head>
+<body>
+<div class="innpakning">
+    <div id="overskrift">
+        <div id="player2">0 points</div>
+        <div id="midtTekst">Pong!</div>
+        <div id="player1">0 points</div>
+    </div>
+
+    <canvas height="400" width="600" id="minCanvas"></canvas>
+    <p>
+        Left player: w = up, s = down
+        <br>
+        Right player: arrows up/down = up/down
+    </p>
+</div>
+
+
+
+<script>
+    // Variabler
+    var bip = new Audio('beep.wav');
+    var teller = 0;
+    var tellerPlayer1 = 0;
+    var tellerPlayer2 = 0;
+    var minCanvas = document.getElementById("minCanvas");
+    var ctx = minCanvas.getContext("2d");
+    var theGameIsOn = true; // global variabel som forteller at spillet skal fortsette å kjøre
+    var t0 = performance.now(); // starter timeren
+    var t1 = 0; // sluttid i timerfunksjonene. settes lik 0 i starten.
+
+    var bane = { // Objektet bane (den er objekt pga den har egenskaper som bredde og høyde)
+        bredde: minCanvas.width,
+        hoyde: minCanvas.height,
+        gressfarge: "#383838",
+        linjefarge: "White",
+        linjetykkelse: 4
+    };  // Her avsluttes objektet
+    var ball = { //objektet ball (bør være et lite kvadrat for pong!)
+        bredde: 7,
+        xpos: bane.bredde/2, // x-posisjon ved start
+        ypos: bane.hoyde/2, // y-pos ved start
+        farge: "White",
+        //xretning: -1, // bevegelse mot venstre
+        xretning: Math.round(Math.random()) * 2 - 1, // random -1 eller 1 --> høyre eller venstre
+        //yretning: 1, // bevegelse nedover
+        yretning: Math.round(Math.random()) * 2 - 1,  // random -1 eller 1
+        xfart: 4,
+        yfart: 4
+        //xfart: Math.floor((Math.random() * 10) + 4),
+        //yfart: Math.floor((Math.random() * 5) + 2)
+    };
+    var racket = {
+        bredde: 10,
+        hoyde: 50,
+        farge: "White",
+        xpos: bane.bredde -15,  // 15 px fra høyre kant
+        ypos: bane.hoyde/2, // halvparten av høyden til banen
+        yretning: 0,  // hvilken vei racket beveger seg
+        yfart: 7  // ant px racket beveger seg
+    };
+    var motspiller = {
+        bredde: 10,
+        hoyde: 50,
+        farge: "White",
+        xpos: 15,   // Racket 15 px fra venstre kant
+        //ypos: ball.ypos // ypos er samme som ballens posisjon gir Uovervinnelig motspiller
+        ypos: bane.hoyde/2, // halvparten av høyden til banen
+        yretning: 0,  // hvilken vei racket beveger seg
+        yfart: 7  // ant px racket beveger seg
+    };
+
+
+    // Kjøring av funksjoner
+
+    function gameLoop() {
+        tegnBane();
+        tegnBall();
+        tegnRacket();
+        tegnMotspiller();
+        sjekkOmBallTrefferRacket();
+        sjekkOmBallTrefferMotspiller();
+        sjekkOmBallTrefferVegg();
+        sjekkOmBallErUtenforBanen();
+        if(theGameIsOn === true) {
+            requestAnimationFrame(gameLoop);
+        }
+    }
+
+    gameLoop();
+
+    // Fange opp piltastene!!!
+    // Først fanger vi opp høyre spiller
+    document.onkeydown = function(evt) {
+        var tastekode = evt.keyCode;
+        if(tastekode === 38) {  // Pil opp ASCII-nummer
+            racket.yretning = -1;      // Racket flytter seg oppover
+        }
+        else if(tastekode === 40) {  // Pil ned ASCII-nummer
+            racket.yretning = 1;    // Racket flytter seg nedover
+        }
+        else if(tastekode === 87) {  // w (opp) ASCII-nummer
+            motspiller.yretning = -1;    // Racket flytter seg oppover
+        }
+        else if(tastekode === 83) {  // s (ned) ASCII-nummer
+            motspiller.yretning = 1;    // Racket flytter seg nedover
+        }
+
+    };
+    document.onkeyup = function(evt) {
+        var tastekode = evt.keyCode;
+        if(tastekode === 38 && racket.yretning === -1) {
+            racket.yretning = 0;    // stopp racket når opp-tasten slippes
+        }
+        else if(tastekode === 40 && racket.yretning === 1) {
+            racket.yretning = 0;    // stopp racket når ned-tasten slippes
+        }
+        else if(tastekode === 87 && motspiller.yretning === -1) {
+            motspiller.yretning = 0;    // stopp racket når w-tasten slippes
+        }
+        else if(tastekode === 83 && motspiller.yretning === 1) {
+            motspiller.yretning = 0;    // stopp racket når s-tasten slippes
+        }
+
+    }
+
+</script>
+</body>
+</html>
