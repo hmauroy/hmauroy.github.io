@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="https://hmauroy.github.io/8bitHenrik.png">
+    <meta name="author" content="Henrik Mauroy">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="slider_css_rules.css">
+    <title>Hvor mange firesifrede tall er delelig med valgfritt tall</title>
+    <script>
+        /* S1 oppgave 7.16c) Hvor mange firesifrede tall er delelig med valgfritt tall */
+
+        window.onload = oppstart;
+
+        var minTall = 1000;    // Starter på 1000 som er det første firesifrede tallet
+        var antallSiffer = 4;
+        var maxTall;
+        var deleTall;
+        var teller = 0;
+
+        function oppstart() {
+            // Hovedprogramkode her...
+            oppdater();
+            document.getElementById("minTall").oninput = oppdater;
+            document.getElementById("maxTall").oninput = oppdater;
+            document.getElementById("txtMinTall").onkeyup = oppdaterTxt;
+            document.getElementById("txtMaxTall").onkeyup = oppdaterTxt;
+            document.getElementById("txtDeleTall").onkeyup = oppdater;
+            document.getElementById("btnBeregn").onclick = beregn;
+            document.getElementById("btnReset").onclick = resetPage;
+        }
+
+        function oppdater() {
+            minTall = document.getElementById("minTall").value;
+            maxTall = document.getElementById("maxTall").value;
+            deleTall = document.getElementById("txtDeleTall").value;
+            console.log("deletall: " + deleTall);
+            document.getElementById("txtMinTall").value = minTall;
+            document.getElementById("txtMaxTall").value = maxTall;
+        }
+        function oppdaterTxt() {    // Setter verdien til slidere når tekstboks benyttes
+            minTall = document.getElementById("txtMinTall").value;
+            maxTall = document.getElementById("txtMaxTall").value;
+            document.getElementById("maxTall").value = maxTall;
+            document.getElementById("minTall").value = minTall;
+        }
+
+        function beregn() {
+            teller = 0;
+            for(var i=minTall; i<maxTall; i++) {
+                if(i%deleTall == 0) {
+                    teller++;
+                }
+            }
+            console.log("Antall " + antallSiffer + "-tall som er delelig med " + deleTall + " er " + teller);
+            document.getElementById("antallTall").innerHTML = teller;
+            document.getElementById("antallSiffer").innerHTML = antallSiffer;
+            document.getElementById("deleTall").innerHTML = deleTall;
+            document.getElementById("svarBoks").style.visibility = "visible";
+        }
+
+        function resetPage() {
+            minTall = 1000;
+            maxTall = 9999;
+            deleTall = 5;
+            document.getElementById("maxTall").value = maxTall;
+            document.getElementById("minTall").value = minTall;
+            document.getElementById("txtMinTall").value = minTall;
+            document.getElementById("txtMaxTall").value = maxTall;
+            document.getElementById("txtDeleTall").value = deleTall;
+        }
+
+
+
+    </script>
+    <style>
+        body {
+            font-size: 5vh;
+            font-family: monospace;
+        }
+        h1 {
+            font-size: 8vh;
+        }
+        #minTall, #maxTall {
+            width: 50%;
+        }
+        #svarBoks {
+            visibility: hidden;
+        }
+        input[type="text"] {
+            font-size: 200%;
+            color: red;
+            width: 600px;
+            text-align: center;
+        }
+        #btnBeregn {
+            font-size: 200%;
+            color: red;
+            margin-top: 20px;
+        }
+
+    </style>
+</head>
+<body>
+<h1>Er tallet delelig?</h1>
+min <input type="range" id="minTall" min="10" max="9998" value="1000" step="1">
+<input type="text" id="txtMinTall" value="1000" placeholder="Minste tall"> <br>
+
+max <input type="range" id="maxTall" min="11" max="9999" value="9999" step="1">
+<input type="text" id="txtMaxTall" value="9999" placeholder="Største tall"> <br>
+
+<input type="text" id="txtDeleTall" value="5" placeholder="Tall å dele på"> <br>
+<button type="button" id="btnBeregn">Beregn!</button>
+<br>
+<button type="button" id="btnReset">Reset</button>
+
+<div id="svarBoks">
+    Det finnes <span id="antallTall">0</span> <span id="antallSiffer">4</span>-sifrede tall som er delelig på <span id="deleTall">5</span>.
+</div>
+
+</body>
+</html>
