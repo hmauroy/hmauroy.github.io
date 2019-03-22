@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="https://hmauroy.github.io/8bitHenrik.png">
+    <meta name="author" content="Henrik Mauroy">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Conway's game of life</title>
+    <script>
+        window.onload = oppstart;
+
+        var hoyde = 101;
+        var bredde = 101;
+        var alive = 0;
+        var cells = [];
+        var nyCells = [];   // et array for å lage nye død og levende verdier
+        var innpakning;
+        var cellSize = 10;
+
+        function oppstart() {
+            // Hovedprogramkode her...
+            innpakning = document.getElementById("innpakning");
+            // lager rutenett
+            for(var i=0; i<hoyde; i++) {
+                cells[i]=[];    // lager en ny array inni cells[i]
+                for(var j=0; j<bredde; j++) {
+                    var celle = document.createElement("div");
+                    celle.className = "celle";
+                    celle.id = i + "," + j;
+                    celle.style.left = j*cellSize + "px";
+                    celle.style.top = i*cellSize + "px";
+                    celle.style.height = cellSize + "px";
+                    celle.style.width = cellSize + "px";
+                    // setter om cellen er død eller levende
+                    alive = Math.round(Math.random());  // tilfeldig tall mellom 0 og 1
+                    if(j % 2 === 0){
+                        if(i % 5 === 0) {
+                            alive = 0;
+                        }
+                    }
+
+                    if(alive === 1) {
+                        celle.style.backgroundColor = "rgba(59,252,49,1)";
+                        cells[i].push(true); // setter true for array-verdi pga cellen er levende
+                        //cells[i][j] = true; // setter true for array-verdi pga cellen er levende
+                        //console.log(i + "," + j + " levende: "+ cells[i][j]);
+
+                    }
+                    else if(alive === 0) {
+                        celle.style.backgroundColor = "#000000";
+                        cells[i].push(false);
+                        //cells[i][j] = false;
+                        //console.log(i + "," + j + " levende: "+ cells[i][j]);
+                    }
+                    innpakning.appendChild(celle);
+                    //console.log("lagde " + celle.id);
+                }
+            }
+
+            document.getElementById("knapp").onclick = startLife;
+        }
+
+        function startLife() {
+            setInterval(updateLife,50);
+            var parent = document.getElementById("knapper");
+            parent.removeChild( document.getElementById("knapp"));
+        }
+
+        function updateLife() {
+            // sjekker hvordan det står til med hver celle
+            for (var i = 0; i < cells.length; i++) {
+                nyCells[i] = [];    // lager et nytt underArray i nyCells
+                if(i === 0 || i === cells.length-1) { // må kutte vekk endene på arrayet pga vi ikke kan sjekke de cellene som lever der.
+                    for(var m=0; m<cells.length; m++) {
+                        //console.log("nyCellsIkkeFørsteSisteRad " + i+","+m);
+                        nyCells[i][m] = m*100;
+                        //console.log(nyCells[i][m]);
+                    }
+
+                }
+                else {
+                    for (var j = 0; j < cells[i].length; j++) {
+                        if(j===0 || j===cells[i].length-1) {  // må kutte vekk endene på arrayet pga vi ikke kan sjekke de cellene som lever der.
+                            nyCells[i][j] = 0;
+                            //console.log("nyCells ikkeEnder" + i+","+j);
+                        }
+                        else {  // Dersom det ikke er øverste eller nederste rad, eller helt til venstre eller helt til høyre så kan vi sjekke naboer
+                            //console.log("nyCellsSjekkNabo" + i +"," + j);
+                            nyCells[i][j] = checkNeighbour(i, j);  // checkNeighbours returnerer enten true eller false
+                        }
+
+                    }
+                }
+
+            }
+            /*console.log("nyCells");
+            for(var k=0; k<cells.length;k++) {
+                console.log("nyCells: " + 0 +"," + k + " " + nyCells[0][k]);
+            }
+            */
+
+            // kopierer alt fra nyCells[] inn tilbake i cells[]
+            for (var i = 0; i < cells.length; i++) {
+                for (var j = 0; j < cells[i].length; j++) {
+                    cells[i][j] = nyCells[i][j];    // kopierer verdien tilbake til hovedArrayet
+                    //console.log("nyCells: " + i +"," + j + " " + nyCells[i][j]);
+                }
+            }
+
+            console.log("Tegner opp alt på nytt");
+
+            // sletter alt sammen fra nettsiden
+            innpakning.innerHTML = "";
+
+            // tegner opp rutenettet igjen etter at alle levende og død-verdier er satt i loopen over
+            // HELE rutenettet blir nå tegnet opp for å få med kantene
+            for (var i = 0; i < cells.length; i++) {
+                for (var j = 0; j < cells[i].length; j++) {
+                    var celle = document.createElement("div");
+                    celle.className = "celle";
+                    celle.id = i + "," + j;
+                    celle.style.left = j * cellSize + "px";
+                    celle.style.top = i * cellSize + "px";
+                    celle.style.height = cellSize + "px";
+                    celle.style.width = cellSize + "px";
+                    // setter om cellen er død eller levende
+                    if (cells[i][j] === true) {
+                        celle.style.backgroundColor = "rgba(59,252,49,1)";
+                    }
+                    else {
+                        celle.style.backgroundColor = "#000000";
+                    }
+                    innpakning.appendChild(celle);
+                    //nyDiv.appendChild(celle);
+                }
+            }
+        } // end updateLife()
+
+        function checkNeighbour(i,j) {
+            var naboer = 0;
+            // sjekker om en celle har noen naboer over, til siden, eller under seg i en motif på 9
+            // X X X = (i-1,j-1) (i-1,j) (i-1,j+1)
+            // X O X = (i,j-1)   (i,j)   (i,j+1)
+            // X X X = (i+1,j-1) (i+1,j) (i+1,j+1)
+            // sjekker over
+            if(cells[i-1][j-1] === true) {
+                naboer++;
+            }
+            if(cells[i-1][j] === true) {
+                naboer++;
+            }
+            if(cells[i-1][j+1] === true) {
+                naboer++;
+            }
+
+            // sjekker til siden
+            if(cells[i][j-1] === true) {
+                naboer++;
+            }
+            if(cells[i][j+1] === true) {
+                naboer++;
+            }
+
+            // sjekker under
+            if(cells[i+1][j-1] === true) {
+                naboer++;
+            }
+            if(cells[i+1][j] === true) {
+                naboer++;
+            }
+            if(cells[i+1][j+1] === true) {
+                naboer++;
+            }
+            //console.log(i + "," + j + "antall naboer = " + naboer);
+
+            if(cells[i][j] === true) {  // Dersom en celle er levende sjekker man om den skal dø
+                //console.log(i + "," + j + "True levende: "+ cells[i][j] +" antall naboer: " + naboer);
+                if(naboer < 2) {    // Regel 1: en celle med færre enn 2 naboer død
+                    return false;
+                }
+                else if(naboer > 3) {   // Regel 3: en celle med mer enn 3 naboer dør pga overbefolkning
+                    return false;
+                }
+                else {  // dersom den har 2 eller 3 naboer fortsetter den å leve (regel 2)
+                    return true;
+                }
+            }
+            else if(cells[i][j] === false){ // Dersom en celle er død sjekker man om den skal bli levende
+                //console.log(i + "," + j + "False levende: "+ cells[i][j] +" antall naboer: " + naboer);
+                if(naboer === 3) {  // Regel 4: en død celle blir levende hvis den har nøyaktig 3 levende naboer
+                    return true;
+                }
+                else {
+                    return false;   // den fortsetter å være død
+                }
+
+            }
+
+
+        } // end checkNeighbour(i,j)
+
+    </script>
+    <style>
+        #innpakning {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
+        .celle {
+            background-color: black;
+            position: absolute;
+        }
+        #knapp {
+            width:80px;
+            height: 50px;
+            border-radius: 5%;
+            background-color: lightgrey;
+            position: absolute;
+            left: 1100px;
+        }
+
+    </style>
+</head>
+<body>
+<div id="innpakning">
+
+</div>
+<div id="knapper">
+    <button type="button" id="knapp">
+        Start simulering
+    </button>
+</div>
+
+
+</body>
+</html>
