@@ -9,7 +9,8 @@
     <script>
         window.onload = oppstart;
 
-        var arr = [0,0,0,0,0,0,0,0];
+        var arr = [];
+        var lengde = 4;
         var base = 2;
         var teller = -1;
         var baseNumbers = [2,3,4,5,6,7,8,9,10];
@@ -24,6 +25,13 @@
             teller = -1;
             base = parseInt(document.getElementById("selMeny").value);
             console.log("Selected base is: " + base);
+            // Tømmer utskriften
+            document.getElementById("utskrift").innerHTML = "Her kommer tallene i base " + base + " nedover...";
+            // Lager arrayet av lengde m
+            arr = [];   // tømmer arrayet
+            for(var i=0; i<lengde; i++) {
+                arr.push(0);
+            }
             teller++;
             console.log(teller + " " + arr);
             runBit(arr.length-1);  // counts the last bit
@@ -33,6 +41,10 @@
                 arr[n] += 1;
                 teller++;
                 console.log(teller + " " + arr);
+                let tall = document.createElement("span");
+                tall.innerHTML = arr;
+                tall.className = "tallKlassen";
+                document.getElementById("utskrift").appendChild(tall);
             }
             incrementBit(n-1);
         }
@@ -77,6 +89,9 @@
         body {
             font-family: "Zig Computer";
         }
+        .tallKlassen {
+            display: block; /* gjør utskriften til blokk så de ligger oppå hverandre */
+        }
 
     </style>
 </head>
@@ -89,6 +104,10 @@ Select a base <select id="selMeny"> </select>
 <br>
 
 <button type="button" id="btnReg">Start counting</button>
+
+<br>
+
+<div id="utskrift">Her kommer tallene i base 2 nedover...</div>
 
 
 </body>
