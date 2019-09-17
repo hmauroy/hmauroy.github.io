@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Henrik Mauroy">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Skyvepuslespill</title>
+    <script>
+        window.onload = oppstart;
+
+        var brikker = [];
+        var bilder = ["peppaPig600.png", "mikkeMus600.png", "airJordan600.png", "brannmannSam600.png"];
+        var puslespillBilde = "";
+        var offsetX = 0;
+        var offsetY = 0;
+        var n = 3;  // størrelse på nxn spillbrett
+        var brikkeBredde = 600/n; // brikkenes størrelse, n=7 og n=9 virker ikke
+        var xy = [];
+        var kanFlyttes = false;
+        var imgObject = new Image();    // lager bakgrunnsbildet til brikkene. Dette tar noe tid som sjekkes med onImgLoaded() senere.
+        var loadTimer;  // håndtak til en timerfunksjon for å vente på at bilde-objektet er ferdiglaget
+        var bildeArray = [];    // holder informasjon om koordinater til bilder
+        var clickCounter = 0;
+
+        function oppstart() {
+            // Hovedprogramkode her...
+            lagMenyBilder();
+        }
+
+        function lagMenyBilder() {
+            // Lager menysystem som siden forsvinner:
+            // 1) Viser forskjellige puslespill man kan velge
+            let menyBilder = document.getElementById("menyBilder");
+            for(let i=0; i<bilder.length; i++) {
+                let bilde = document.createElement("div");
+                bilde.style.backgroundImage = "url('" + bilder[i] + "')";
+                bilde.className = "bildevalg";
+                bilde.onclick = function() {
+                    let url = this.style.backgroundImage; // Henter ut verdien til bakgrunnsbildet: "url('filnavn')"
+                    url = url.split('"');   // lager et array av url-en: [ "url(" , filnavnet , ")" ]
+                    puslespillBilde = url[1];   // plukker ut index 1 som alltid inneholder filnavnet pga bildene ligger i samme mappe
+                    this.style.filter = "brightness(50%) blur(2px)";    // Styler bildet så man ser at det har blitt klikket
+                    lagKnapper();
+                };
+                menyBilder.appendChild(bilde);
+            }
+        }
+
+        function lagKnapper() {
+            // 2) Valgfri størrelse menyknapper
+            let menySize = document.getElementById("menySize");
+            for(let j=3; j<=6; j++) {
+                let knapp = document.createElement("div");
+                knapp.innerHTML = j + "x" + j;
+                knapp.className = "knapp";
+                knapp.id = "" + j;
+                knapp.onclick = function() {
+                    n = Number(this.id);
+                    brikkeBredde = 600/n;
+                    importerBilde();    // fortsetter programmet med denne funksjonen
+                };
+                menySize.appendChild(knapp);
+            }
+        }
+
+        function importerBilde() {
+            // Sletter hele menysystemet
+            let menyen = document.getElementById("meny");
+            menyen.parentNode.removeChild(menyen);  // Fjerner menyen ved å kalle opp moren som så kan slette barnet sitt
+            // Setter bakgrunnsbildet
+            //imgObject.src = "peppaPig600.png";  // nå er imgObject laget ferdig og vi kan sette bildets URL
+            imgObject.src = puslespillBilde;  // nå er imgObject laget ferdig og vi kan sette bildets URL
+            onImgLoaded();  // starter onImgLoaded() som venter med å prosessere bildet til objektet imgObject er ferdiglaget
+        }
+
+
+        function onImgLoaded() {    // denne funksjonen startes opp for å vente til imgObject er laget
+            if (loadTimer != null) clearTimeout(loadTimer);
+            if (!imgObject.complete) {
+                loadTimer = setTimeout(function() {
+                    onImgLoaded();
+                }, 3);
+            } else {
+                createImageCoordinates();   // lager mange bakgrunnsbilde-koordinater i tilfeldig rekkefølge
+            }
+        }
+        function createImageCoordinates() {
+            // Lager array med alle startX og startY som legges i tilfeldig rekkefølge
+            var startX = 0;
+            var startY = 0;
+            var teller = 0;
+            for(let i=0; i<n; i++) {
+                startX = 0;
+                for(let j=0; j<n; j++) {
+                    if(teller === n*n-1) {
+                        break; // returnerer når vi har kommet til den åpne plassen som alltid har koordinat n x n
+                    }
+                    bildeArray[teller] = [startX,startY];  // lager 1D-array pga lettere å randomisere
+                    startX += brikkeBredde;
+                    teller++;
+                }
+                startY += brikkeBredde;
+            }
+            //console.log(bildeArray);
+            shuffle(bildeArray);    // tilfeldiggjør arrayet
+            lagBrikker();   // Starter funksjonen som lager brikkene
+        }
+        function lagBrikker() {
+            // 1) Lag n x n brikker minus én ledig
+            let teller = 0;
+            for(var i=0; i<n; i++) { // lager loddrette celler
+                brikker.push([]);   // lager ny celle
+                offsetX = 0;  // tilbakestill offset langs x-aksen når man lager ny rad
+                for(var j=0; j<n; j++) {    // lager vannrette celler
+                    brikker[i].push([]);    // lager en ny celle
+                    brikker[i][j] = 1; // legger inn tallet 1 i hver celle som betyr at det er en brikke der
+                    //console.log(brikker[i][j]);
+                    // 2) Lager 4x4 brikker
+                    if(i === n-1 && j === n-1) {
+                        brikker[i][j] = 0; // legger inn tallet 0 i den siste cellen pga der er det ingen brikke
+                        break;  // hopper ut av loopen så vi ikke lager en brikke i nederste høyre hjørne
+                    }
+                    var div = document.createElement("div");
+                    div.className = "brikke";
+                    div.style.left = offsetX+1 + "px";  // legger til 2 pga border er 1px på hver side
+                    div.style.top = offsetY+1 + "px";   // border er 2px oppe og nede
+                    div.style.width = (brikkeBredde - 2) + "px"; // Velger meg 2 px mindre for å lage mellomrom mellom brikker
+                    div.style.height = (brikkeBredde - 2) + "px";
+                    div.id = "" + i + j;   // lager unik id
+                    div.xpos = j;   // setter koordinatene. Disse endres når brikken flyttes
+                    div.ypos = i;
+                    // Lager bakgrunnsbilde
+                    var newImg = getImagePortion(imgObject, brikkeBredde, brikkeBredde, bildeArray[teller][0], bildeArray[teller][1], 1); // 4. og 5. argument er offset som tas fra tilfeldig array
+                    div.style.backgroundImage = "url(" + newImg + ")";  // setter bakgrunnsbildet til brikken
+                    div.onclick = function() {
+                        console.clear();    // tømmer konsollen
+                        console.log(this.id);
+                        console.log("x,y: " + this.xpos + "," + this.ypos);
+                        //this.style.backgroundColor = "red";
+                        var left = this.style.left; // plukker ut "px"-verdien som tekst
+                        left = parseInt(left.substring(0,left.length-2));    // plukker ut tallene foran "px" (minus de to siste bokstavene)
+                        var top = this.style.top; // plukker ut "px"-verdien som tekst
+                        top = parseInt(top.substring(0,top.length-2));
+                        console.log(top + "," + left);
+                        // Sjekker hvilken vei brikken kan flyttes. Da må vi lese gjennom arrayet for å vite hvor 0-verdien ligger
+                        xy = sjekkBrikkeArray();
+                        console.log("xy= " + xy);
+                        // Sjekk om brikken er rundt den åpne brikken
+                        kanFlyttes = sjekkFlytting(this.xpos,this.ypos);   // sender med koordinatene til brikken
+                        console.log("kanFlyttes=" + kanFlyttes);
+                        if(kanFlyttes) {
+                            clickCounter++;  // øker klikketelleren når man gjør et gyldig trekk
+                            document.getElementById("antKlikk").innerHTML = "Antall trekk: " + clickCounter;   // skriver ut antall klikk
+                            // 3) Oppdater array når brikker flyttes
+                            oppdaterArray(this.xpos,this.ypos); // sender av gårde koordinatene til brikken som ble flyttet. Den blir merket 0 og alle andre er 1
+                            if(this.xpos < xy[0]) { // flytte mot høyre
+                                this.style.left = left + brikkeBredde + "px";
+                                this.xpos += 1; // legger til en posisjon i rutenettet
+                            }
+                            else if(this.xpos > xy[0]) { // flytte mot venstre
+                                this.style.left = left - brikkeBredde + "px";
+                                this.xpos -= 1; // trekker fra en posisjon i rutenettet
+                            }
+                            else if(this.ypos < xy[1]) { // flytte ned
+                                this.style.top = top + brikkeBredde + "px";
+                                this.ypos += 1; // legger til en posisjon nedover i rutenettet
+                            }
+                            else if(this.ypos > xy[1]) { // flytte opp
+                                this.style.top = top - brikkeBredde + "px";
+                                this.ypos -= 1; // trekker fra en posisjon i rutenettet
+                            }
+                            kanFlyttes = false; // resetter om brikker kan flyttes eller ikke
+                        }
+                    };
+                    document.getElementById("spillbrett").appendChild(div);
+                    offsetX += brikkeBredde; // juster neste brikke til å være 100px til høyre for forrige brikke
+                    teller++;   // oppdaterer telleren som kjører gjennom bildeArray
+                }
+                offsetY += brikkeBredde; // juster neste brikkerad til å være 100px nedenfor
+            }
+            document.getElementById("spillbrett").style.width = (n*brikkeBredde) + "px";
+            document.getElementById("spillbrett").style.height = (n*brikkeBredde) + "px";
+            //console.log(brikker);
+        }
+        function oppdaterArray(x,y) {   // oppdaterer hvor den åpne plassen er
+            console.log("x: " + x);
+            console.log("y: " + y);
+            for(var i=0; i<brikker.length; i++) {
+                for(var j=0; j<brikker[0].length; j++) {
+                    brikker[i][j] = 1;  // setter først alle celler lik 1
+                }
+            }
+            brikker[y][x] = 0;  // setter cellen som skal endres til 0 pga nå er det ingen brikke på plassen
+            console.log(brikker);
+        }
+        function sjekkBrikkeArray() {   // sjekker posisjonen til den åpne plassen
+            let xy = [];
+            //console.log(brikker);
+            for(var i=0; i<brikker.length; i++) {
+                for(var j=0; j<brikker[0].length; j++) {
+                    if(brikker[i][j] === 0) {
+                        xy = [j,i]; // finner koordinatene til 0-verdien som (left,top)
+                        break;
+                    }
+                }
+            }
+            return xy;
+        }
+        function sjekkFlytting(x,y) {   // Sjekker om brikken er rett rundt den åpne plassen
+            if( (x  === xy[0] - 1 && y  === xy[1]) || (x  === xy[0] + 1 && y  === xy[1]) ) {
+                return true;
+            }
+            else if( (x  === xy[0] && y  === xy[1] - 1) || (x  === xy[0] && y  === xy[1] + 1) ) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        function getImagePortion(imgObj, newWidth, newHeight, startX, startY, ratio){
+            /* the parameters: - the image element - the new width - the new height - the x point we start taking pixels - the y point we start taking pixels - the ratio */
+            //set up canvas for thumbnail
+            var tnCanvas = document.createElement('canvas');
+            var tnCanvasContext = tnCanvas.getContext('2d');
+            tnCanvas.width = newWidth; tnCanvas.height = newHeight;
+
+            /* use the sourceCanvas to duplicate the entire image. This step was crucial for iOS4 and under devices. Follow the link at the end of this post to see what happens when you don’t do this */
+            var bufferCanvas = document.createElement('canvas');
+            var bufferContext = bufferCanvas.getContext('2d');
+            bufferCanvas.width = imgObj.width;
+            bufferCanvas.height = imgObj.height;
+            bufferContext.drawImage(imgObj, 0, 0);
+
+            /* now we use the drawImage method to take the pixels from our bufferCanvas and draw them into our thumbnail canvas */
+            tnCanvasContext.drawImage(bufferCanvas, startX,startY,newWidth * ratio, newHeight * ratio,0,0,newWidth,newHeight);
+            return tnCanvas.toDataURL();
+        }
+        function shuffle(array) {
+            var currentIndex = array.length, temporaryValue, randomIndex;
+
+            // While there remain elements to shuffle...
+            while (0 !== currentIndex) {
+
+                // Pick a remaining element...
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex -= 1;
+
+                // And swap it with the current element.
+                temporaryValue = array[currentIndex];
+                array[currentIndex] = array[randomIndex];
+                array[randomIndex] = temporaryValue;
+            }
+
+            return array;
+        }
+
+    </script>
+    <style>
+        body {
+            background-color: black;
+        }
+        #meny {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            width: 100vw;
+            height: 95vh;
+            margin: auto;
+            color: white;
+        }
+        .vannrett {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            align-items: center;
+            width: 100vw;
+            height: 70%;    /* 50% av mor-div*/
+            margin: auto;
+
+        }
+        #menySize {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            width: 30%;
+        }
+        .knapp {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100px;
+            height: 60px;
+            background-color: orangered;
+            color: white;
+            font-size: 150%;
+            font-family: "Comic Sans MS";
+            text-shadow: 2px 2px 5px black;
+        }
+        .knapp:hover {
+            filter: hue-rotate(180deg);
+            cursor: pointer;
+        }
+        .bildevalg {
+            width: 300px;
+            height: 300px;
+            background-color: orangered;
+            margin: 2vw;
+            background-size: cover;
+            cursor: pointer;
+        }
+        .bildevalg:hover {
+            filter: blur(2px);
+        }
+        .brikke {
+            position: absolute; /* absolute i forhold til mor-div */
+            background-color: #0b7cac;
+            transition: 0.2s;
+        }
+        #spillbrett {
+            position: relative; /* må være relative for å kunne bevege seg og for at datter-divene kan posisjoneres relativt til seg selv */
+            margin: auto;
+            border: solid black 1px;
+        }
+        #antKlikk {
+            font-size: 200%;
+            color: white;
+            text-shadow: 2px 2px red;
+        }
+
+    </style>
+</head>
+<body>
+<div id="meny">
+    <div class="vannrett" id="menyBilder"></div>
+    <div class="vannrett">
+        <div id="menySize"></div>
+    </div>
+</div>
+
+<div id="spillbrett"></div>
+<div id="antKlikk">Antall trekk: 0</div>
+
+
+</body>
+</html>
