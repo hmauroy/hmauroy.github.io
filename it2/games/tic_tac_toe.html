@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Henrik Mauroy">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>tic-tac-toe</title>
+    <script>
+        window.onload = oppstart;
+        /*
+        41.	Tic-tac-toe. Lag et spillbrett med 20x20 ruter (eller større). Bruker klikker på ønsket rute
+        for å plassere enten et kryss eller sirkel. Siden pc-er kun har én mus bør det være slik at
+        annethvert klikk er enten kryss eller sirkel. Start ved å lage en 3x3 ruter versjon og øk deretter til 20x20.
+        Vanskelig versjon: Spillet starter kun med 9 ruter og færrest mulig linjer. Når bruker plasserer et symbol
+        i en av de ytterste rutene vil nye ruter dannes rundt dette symbolet.
+         */
+
+        /*
+        OBS OBS! Viktig om Canvas og størrelser. Attributtene høyde og bredde setter canvas sin størrelse. Hvis de ikke er
+        satt blir det default 300px bredde og 150px høyde.
+        OBS OBS 2! Canvas MÅÅÅÅÅÅ bruke px for størrelse pga det bruker bitmap for grafikken.
+        For <canvas> elements, the CSS rules for width and height set the actual size of the canvas element that will be drawn to the page. On the other hand, the HTML attributes of width and height set the size of the coordinate system or 'grid' that the canvas API will use.
+         */
+
+        var klikkTeller = 0;
+
+        var n = 20;  // antall vannrett
+        var m = 20;  // antall loddrett
+
+        n = prompt("Hvor mange ruter vannrett?");   // bruker kan velge selv
+        m = prompt("Hvor mange ruter loddrett?");
+
+        var bredde = 0.95*(window.innerHeight)/n;  // beregner hvor stor andel av høyden vi kan lage rutene
+        var hoyde = 0.95*(window.innerHeight)/n;
+        console.log(bredde);
+
+        var kryssOffset = 0.1 * bredde;
+
+        function oppstart() {
+            // Hovedprogramkode her...
+            // 1) Generer spillbrettet
+            // beregner først størrelser
+
+            for(let i=0; i<m; i++) {
+                let vannrett = document.createElement("div");
+                vannrett.className = "vannrett";
+                document.body.appendChild(vannrett);
+                for(let j=0; j<n; j++) {
+                    let rute = document.createElement("canvas");
+                    rute.className = "rute";
+                    rute.id = "" + i + "" +  j;
+                    rute.setAttribute("width",bredde+"px");
+                    rute.setAttribute("height",hoyde+"px");
+                    vannrett.appendChild(rute);     // legger ruten inn i den vannrette diven
+                }
+            }
+            // 2) Lager lyttefunksjoner på hver rute
+            let antall = n * m;
+            var spillbrett = document.getElementsByTagName("canvas");   // Tar tak i alle elementene som er et canvas. Dette blir et array.
+            for(let i=0; i<antall; i++) {
+                spillbrett[i].onclick = function() {    // Plukker ut et og et canvas
+                    plasserBrikke(this.id); // starter plasserSymbol() og sender med id til denne ruten
+                    console.log(this.id);
+                }
+            }
+        }
+
+        function plasserBrikke(id) {
+            klikkTeller++;  // Øker fra 0 så vi tester modulo på 1 som gir oddetall og kryss
+            if(klikkTeller % 2 === 0) { // Dersom partall er det sirkel sin tur
+                sirkel(id); // lager en sirkel i ruten som er trykket på
+            }
+            else {
+                kryss(id); // lager et kryss i ruten som er trykket på
+            }
+        }
+
+        function kryss(id) {
+            var c = document.getElementById(id);
+            var ctx = c.getContext("2d");
+            ctx.strokeStyle = "red";
+            ctx.lineWidth = 5;
+            ctx.moveTo(kryssOffset,kryssOffset);    // f.eks. (20,20) når rute er 200x200px
+            ctx.lineTo(bredde-kryssOffset,bredde-kryssOffset);        // f.eks. (180,180)
+            ctx.stroke();
+            ctx.moveTo(bredde-kryssOffset,kryssOffset);
+            ctx.lineTo(kryssOffset,bredde-kryssOffset);
+            ctx.stroke();
+
+        }
+        function sirkel(id) {
+            var c = document.getElementById(id);
+            var ctx = c.getContext("2d");
+            ctx.strokeStyle = "orange";
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            ctx.arc(bredde/2, bredde/2, (75/200)*bredde, 0, 2 * Math.PI);   // (x, y, radius, startAngle, endAngle)
+            ctx.stroke();
+        }
+
+
+    </script>
+    <style>
+        .vannrett {
+            display: flex;
+            justify-content: center;
+            flex-direction: row;
+        }
+        .rute {
+            display: flex;
+            border: solid black 3px;
+            margin-bottom: -3px;
+            margin-right: -3px;
+        }
+        #boks {
+            width: 25vw;
+            height:25vw;
+            border: solid 1px;
+        }
+
+    </style>
+</head>
+<body>
+
+<!--
+<div class="vannrett">
+    <canvas class="rute" id="00" width="200px" height="200px"></canvas>
+    <canvas class="rute" id="01" width="200px" height="200px"></canvas>
+    <canvas class="rute" id="02" width="200px" height="200px"></canvas>
+</div>
+<div class="vannrett">
+    <canvas class="rute" id="10" width="200px" height="200px"></canvas>
+    <canvas class="rute" id="11" width="200px" height="200px"></canvas>
+    <canvas class="rute" id="12" width="200px" height="200px"></canvas>
+</div>
+<div class="vannrett">
+    <canvas class="rute" id="20" width="200px" height="200px"></canvas>
+    <canvas class="rute" id="21" width="200px" height="200px"></canvas>
+    <canvas class="rute" id="22" width="200px" height="200px"></canvas>
+</div>
+
+-->
+
+
+
+</body>
+</html>
