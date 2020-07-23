@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Henrik Mauroy">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CnvsClk</title>
+    <script>
+        window.onload = oppstart;
+
+        /*
+        Koden er laget fra scratch, men idé og fargevalg er hentet fra Coding Train:
+        https://www.youtube.com/watch?v=E4RyStef-gY
+         */
+
+        var cnv;    // global variabel håndtak til canvas-element
+        var ctx;    // global variablen som er kontekst til canvas-elementet
+        var klokkeIntervall;
+
+        const farger = ["#fd6496","#9563fe","#98ec66"]; // farger på klokken
+
+        function oppstart() {
+            // Hovedprogramkode her...
+            document.getElementById("overlay").style.left = window.innerWidth/6 + "px";
+            document.getElementById("overlay").style.top = window.innerHeight/100 + "px";
+            window.addEventListener("resize", resizeCanvas);
+            cnv = lagCanvas(0.4*(window.innerWidth),0.4*(window.innerWidth),"#ffffff");
+            cnv = document.getElementById("tegneflate");
+            ctx = document.getElementById("tegneflate").getContext("2d");
+            oppdaterKlokke();
+
+            cnv.onclick = tegnArc;
+            cnv.addEventListener('contextmenu',function(evt){    // lager en lyttefunksjon som reagerer når contextmenu (høyreklikkmeny) kommer opp
+                evt.preventDefault();
+                ryddCanvas();
+            });
+            //tegnArc(200,200,30);
+            klokkeIntervall = setInterval(oppdaterKlokke,1000);
+        }
+
+        function resizeCanvas() {   // ved resize må vi tegne opp canvas på nytt
+            cnv.setAttribute("width",0.5*(window.innerWidth));
+            cnv.setAttribute("height",0.5*(window.innerWidth));
+            oppdaterKlokke();
+        }
+
+        function oppdaterKlokke() {
+            ryddCanvas();   // rydder canvas før vi tegner opp klokken på nytt
+            // Tegn opp klokkens bakgrunn
+            let x = cnv.width/2;
+            let y = cnv.height/2;
+            let tykkelse = 0.05*x;
+            //tegnKlokke(x,y);
+            // Tegner viserne
+            let d = new Date();
+            let ss = d.getSeconds();
+            let mm = d.getMinutes();
+            let hh = d.getHours();
+            if(hh >= 12) {  // hvis 24-timers-klokken er mer enn kl 12:00 trekker vi fra 12
+                hh = hh - 12;
+            }
+            //console.log(hh + ":" + mm + ":" + ss);
+            tegnArc(x,y,0.7*x,farger[0],ss,tykkelse);    // tegner sekunder med sirkel
+            tegnVinkel(x,y,0.53,360*ss/60-90,farger[0],3);  // tegner sekundviser
+            // Må justere vinkele til å være en andel av minuttet i forhold til sekundene
+            let mm_adjust = (ss/60) + mm;
+            tegnArc(x,y,0.64*x,farger[1],mm_adjust,tykkelse);    // tegner minutter
+            tegnVinkel(x,y,0.45,360*mm_adjust/60-90,farger[1],5);  // tegner minuttviser
+            // Timeviser er ikke delt opp i 60 men i 12
+            // To-Do: Må justere vinkelen til å være en andel av timen i forhold til minutter
+            hh = (mm/60) + hh;    // legger til andelen minutter
+            tegnArc(x,y,0.58*x,farger[2],hh*5,tykkelse);    // tegner timer: ganger med 5 for å få timer opp i 60-gangern
+            tegnVinkel(x,y,0.35,360*hh/12-90,farger[2],5);  // tegner timeviser: deler på 12 for å dele opp vinklene
+        }
+
+
+        function tegnVinkel(offset_x,offset_y,hyp,vinkelDeg,farge,tykkelse) {   // hyp er hvor lang viseren skal være i antall bredder til canvas
+            // 30 deg = (30/360)*2*Math.PI
+            // 60 deg = (60/360)*2*Math.PI
+            // 30 deg = (30/360)*2*Math.PI
+            let x = hyp * Math.cos((vinkelDeg/360)*2*Math.PI)*offset_x;
+            let y = hyp * Math.sin((vinkelDeg/360)*2*Math.PI)*offset_y;
+            ctx.beginPath();    // lager en ny tegning
+            ctx.lineWidth = tykkelse;
+            ctx.strokeStyle = farge;
+            ctx.moveTo(offset_x,offset_y);   // går til sentrum av figuren
+            ctx.lineTo(offset_x + x,offset_y + y);
+            ctx.stroke();
+        }
+
+        function hypotenus(kat1,kat2) {
+            let a = Math.pow(kat1,2);
+            let b = Math.pow(kat2,2);
+            return Math.sqrt(a+b);  // returnerer hypotenusen
+        }
+
+        function tegnArc(x,y,radius,farge,second,tykkelse) { // tegner en bue med start kl 12 og slutt ved 'second'
+            ctx.beginPath();
+            ctx.strokeStyle = farge;
+            ctx.lineWidth = tykkelse;
+            ctx.arc(x, y, radius, -(90/360)*2*Math.PI, ((second-15)/60)*2*Math.PI); // Fra 90 grader rett opp og deretter til 45 sekunder (må trekke fra 15/60 pga en kvart sirkel
+            //ctx.arc(x, y, 70, -(90/360)*2*Math.PI, ((45-15)/60)*2*Math.PI); // Fra 90 grader rett opp og deretter til 45 sekunder (må trekke fra 15/60 pga en kvart sirkel
+            //ctx.arc(x, y, 70, -(second/60)*2*Math.PI, 0);
+            ctx.stroke();
+        }
+
+        function tegnSirkel(evt) {
+            ctx.beginPath();
+            ctx.arc(evt.clientX, evt.clientY, 70, 0, 2*Math.PI);
+            ctx.stroke();
+            //ctx.arc(100, 110, 80, 0.9, 2* Math.PI);
+        }
+
+        function lagCanvas(width,height,bkg) {
+            let cnv = document.createElement("canvas");
+            cnv.setAttribute("width",width);
+            cnv.setAttribute("height",height);
+            //cnv.style.backgroundColor = bkg;  // Hvis ikke satt er canvas gjennomsiktig
+            cnv.id = "tegneflate";
+            document.getElementById("midtstilt").appendChild(cnv);
+            return cnv;
+        }
+
+        function ryddCanvas() {
+            ctx.clearRect(0, 0, cnv.width, cnv.height);
+        }
+
+
+    </script>
+    <style>
+        body {
+            background-color: #323131;
+            font-family: Monospace;
+            font-size: 3vw;
+            color: #98ec66;
+        }
+        #midtstilt {
+            margin: auto;
+            width: 95vw;
+            height: 95vh;
+            display:flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        #overlay {
+            position: absolute;
+            text-align: center;
+            margin: auto;
+        }
+
+    </style>
+</head>
+<body>
+<div id="overlay">
+    <h1>CnvsClk</h1>
+</div>
+<div id="midtstilt"></div>
+
+
+
+</body>
+</html>
