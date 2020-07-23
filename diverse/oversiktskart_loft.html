@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="https://hmauroy.github.io/8bitHenrik.png">
+    <meta name="author" content="Henrik Mauroy">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dynamisk oversiktskart</title>
+    <script>
+        window.onload = oppstart;
+
+        var kvadranter = [
+            7,
+            3,
+            5,
+            8,
+            11,
+            0,
+            6,
+            4,
+            5,
+            0,
+            7,
+            4,
+            3
+        ];
+        var farger = [
+            "98ec66",
+            "98ec66",
+            "98ec66",
+            "98ec66",
+            "EFFF72",
+            "EFFF72",
+            "EFFF72",
+            "fd6496",
+            "fd6496",
+            "fd6496",
+            "fd6496",
+            "fd6496",
+            "fd6496"
+        ];
+
+        function oppstart() {
+            // Hovedprogramkode her...
+            //document.onclick = lagLinje;
+            for(let i=0; i<kvadranter.length; i++) { // Lager linjer i hver kvadrant, en etter en.
+                let denneId = "k"+(i+1);    // konstruerer id-er som k1, k2, k3...
+                console.log(denneId);
+                for(let j=0; j<kvadranter[i]; j++) { // lager n linjer i kvadrant X
+                    lagLinje(denneId, kvadranter[i]); // lager en linje og slenger med antall linjer som skal tegnes opp. Alle linjer skal da ha samme farge.
+                }
+
+            }
+        }
+        function lagLinje(id, nummer) {
+            let div = document.createElement("div");
+            div.className = "fargelinje";
+            if(nummer > 13) { // Hvis databasen har mer enn 13 ting i en kvadrant lager vi en ny rød linje
+                nummer = 13;
+            }
+            let hexfarge = "#" + farger[nummer];
+            console.log(hexfarge);
+            div.style.backgroundColor = hexfarge;
+            document.getElementById(id).appendChild(div); // legger en ny fargelinje inn i kvadranten
+            //console.log("lagde ny linje " + div);
+        }
+
+    </script>
+    <style>
+        body {
+            margin: 0;
+            background-color: #323131;
+        }
+        #innpakning {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            /*background-color: #ff396a;*/
+            flex-direction: column;
+            justify-content: space-around; /* sentrerer i høyden med luft pga direction er column */
+        }
+        .vannrett {
+            width: 100%;
+            height: 31%;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            flex-wrap: nowrap;
+            color: white;
+        }
+        .parboks {
+            width: 39.5%;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+        }
+        .kvadrant {
+            width: 46%;
+            height: 100%;
+            position: relative;
+
+        }
+        .bargraf {
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: -1;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end; /* starter å legge linjene fra bunnen og oppover */
+            border: solid white 1px;
+            border-radius: 5px;
+        }
+        .forgrunn {
+            position: relative;
+            left: 0;
+            top: 40%;
+            width: 4vh;
+            margin: auto;
+            z-index: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Monospace;
+            color: black;
+            font-size: 3vh;
+            border-radius: 1vh;
+            background-color: white;
+        }
+        .spacer {
+            width: 18.5%;
+            position: relative;
+        }
+        .fargelinje { /* linjer som "fyller opp" kvadrantene sånn som et batterisymbol på en mobil */
+            width: 100%;
+            height: 7%; /* Deler opp i 100/8 = 13 linjer per kvadrant */
+            background-color: white;
+            margin-top: 1%;
+        }
+
+
+    </style>
+</head>
+<body>
+<div id="innpakning">
+    <div class="vannrett">
+        <div class="parboks">
+            <div class="kvadrant">
+                <div class="forgrunn">1</div>
+                <div class="bargraf" id="k1"></div>
+            </div>
+            <div class="kvadrant">
+                <div class="forgrunn">2</div>
+                <div class="bargraf" id="k2"></div>
+            </div>
+        </div>
+        <div class="spacer">
+            <div class="forgrunn">3</div>
+            <div class="bargraf" id="k3"></div>
+        </div>
+        <div class="parboks">
+            <div class="kvadrant">
+                <div class="forgrunn">4</div>
+                <div class="bargraf" id="k4"></div>
+            </div>
+            <div class="kvadrant">
+                <div class="forgrunn">5</div>
+                <div class="bargraf" id="k5"></div>
+            </div>
+        </div>
+    </div>
+    <div class="vannrett">
+        <div class="parboks">
+            <div class="kvadrant">
+                <div class="forgrunn">6</div>
+                <div class="bargraf" id="k6"></div>
+            </div>
+            <div class="kvadrant">
+                <div class="forgrunn">7</div>
+                <div class="bargraf" id="k7"></div>
+            </div>
+        </div>
+        <div class="spacer" id="spacer1">Trapp</div>
+        <div class="parboks">
+            <div class="kvadrant">
+                <div class="forgrunn">8</div>
+                <div class="bargraf" id="k8"></div>
+            </div>
+            <div class="kvadrant">
+                <div class="forgrunn">9</div>
+                <div class="bargraf" id="k9"></div>
+            </div>
+        </div>
+    </div>
+    <div class="vannrett">
+        <div class="parboks">
+            <div class="kvadrant">
+                <div class="forgrunn">10</div>
+                <div class="bargraf" id="k10"></div>
+            </div>
+            <div class="kvadrant">
+                <div class="forgrunn">11</div>
+                <div class="bargraf" id="k11"></div>
+            </div>
+        </div>
+        <div class="spacer" id="spacer2">Trapp</div>
+        <div class="parboks">
+            <div class="kvadrant">
+                <div class="forgrunn">12</div>
+                <div class="bargraf" id="k12"></div>
+            </div>
+            <div class="kvadrant">
+                <div class="forgrunn">13</div>
+                <div class="bargraf" id="k13"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
