@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="https://hmauroy.github.io/8bitHenrik.png">
+    <meta name="author" content="Henrik Mauroy">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Vitaminer, mineraler og vann</title>
+    <script src="https://hmauroy.github.io/it2/games/shuffle_array.js"></script>
+    <script>
+        window.onload = oppstart;
+
+        var farger = [
+            ["blue"],
+            ["red"],
+            ["orange"],
+            ["peachpuff"]
+        ];
+
+        var tekst = "";
+        var tester = [];
+        var array = [];
+        var navn = [];
+
+        const fileUrl = 'info.txt' // provide file location
+
+        async function fetchDataText() {
+            const response = await fetch(fileUrl);
+            tester = await response.text();
+            array = tester.split(/\r?\n/);
+            //console.log(array);
+            if(array.length % 2 !== 0) {    // hvis arrayet ikke er partall er trolig siste linje en tom linje pga linjeskift
+                array.pop();   // fjerner eventuell siste linje
+                console.log("oddetall linjer i tekstfilen.");
+            }
+            // Fjerner alle tomme linjer på slutten av tekstfilen hvis noen har tastet enter mange ganger
+            let teller = 0;
+            while(array[array.length-1] === "") {
+                array.pop();    // fjerner siste linjen
+                console.log("Fjernet tom linje på slutten.");
+                teller++;
+                if(teller >= 1000) {    // sikkerhet for å ikke krasje programmet hvis input er gal
+                    lagBrikker();
+                }
+            }
+            // Fortsetter når filen er ferdiglest
+            lagBrikker();
+        }
+
+
+        var trykketForsteKort = false;
+
+        var kort1 = "";
+        var kort1_id = "";
+        var kort1_tekst = "";
+        var kort2_id = "";
+
+        /*
+        Memory-spill av typen ord/begrep på ett kort og forklaring på det andre kortet i paret
+        Bildene er unike div-er som er klikkbare.
+         */
+
+        function oppstart() {
+            fetchDataText();   // starter funksjonen som henter data fra tekstfil
+        }
+
+        function lagBrikker() {
+            //console.log("Oppstart lagBrikker()");
+            //console.log(array);
+            // bretter ut arrayet så vi kan lage par
+            let arrayLengde = array.length;   // finner lengden til arayet
+            navn = [];
+            // Lager nytt array som er dobbelt så langt og putter to og to linjer over hverandre som hvert sitt array inno 2D-arrayet
+            for(let i=0; i<arrayLengde; i+=2) { // For-løkke som øker med 2 hver gang
+                navn.push([i,array[i]]); // legger til informasjonen som infotekst pluss indeksen som blir parvis lik
+                navn.push([i,array[i+1]]); // legger til navnet som infotekst
+            }
+            //console.log(navn);
+            shuffle(navn);    // stokker om på informasjonen
+            //console.log(navn);
+
+            var antKort = 0; // Teller for å passe på at man ikke kan klikke flere enn to kort av gangen inntil timer snur kortene igjen.
+            for(var i=0; i<navn.length; i++) {
+                var bilde = document.createElement("div");
+                bilde.className = "bildekort";
+                bilde.id = "" + i;
+                bilde.personligTall = navn[i][0]; // henter ut tallet som er unikt for hvert par
+                bilde.tekst = navn[i][1]; // henter ut teksten: enten navnet eller forklaringen
+                bilde.onclick = function() {
+                    antKort++;
+                    //console.log(antKort);
+                    // vise bilde
+                    //this.style.backgroundColor = farger[this.personligTall];   // setter fargen som er likt for hvert par pga 'personligTall' deles av parene
+                    if(trykketForsteKort === false && antKort === 1) {
+                        trykketForsteKort = true;
+                        this.style.backgroundColor = "white"   // gir hvit farge pga enkelt å lese
+                        this.style.transform = "rotateY(0deg)";   // roterer om y-aksen så det ser ut som kortet flipper (kortet er i utgangspunktet rotert speilvendt)
+                        this.style.color = "black";
+                        this.innerHTML = this.tekst;
+                        // Oppdaterer informasjon om hvilket
+                        // kort som er valgt
+                        kort1 = this.personligTall;   // henter ut tallet som er unikt for hvert par
+                        kort1_tekst = this.tekst;
+                        kort1_id = this.id;
+                    }
+                    else if(trykketForsteKort === true && antKort === 2 && this.id !== kort1_id) {
+                        // Må oppdatere informasjon om hvilken id kortet har
+                        kort2_id = this.id;
+                        this.style.backgroundColor = "white"   // gir hvit farge pga enkelt å lese
+                        this.style.transform = "rotateY(0deg)"; // roterer om y-aksen så det ser ut som kortet flipper (kortet er i utgangspunktet rotert speilvendt)
+                        this.style.color = "black";
+                        this.innerHTML = this.tekst;
+                        // Sjekker om vi har et par
+                        if(this.personligTall === kort1 && this.tekst !== kort1_tekst) { // sjekker om unikt tall for parene er det samme
+                            // Vi har et par!!!!!!!! ^_^
+                            console.log("Par med " + kort1);
+                            document.getElementById(kort1_id).style.backgroundColor = "lawngreen";
+                            document.getElementById(kort2_id).style.backgroundColor = "lawngreen";
+                            antKort = 0;
+                            trykketForsteKort = false;
+                            this.onclick = function(){null};    // tar vekk onclick-funksjonaliteten for kort 2
+                            document.getElementById(kort1_id).onclick = function(){null}; // tar vekk onclick-funksjonaliteten for kort 1
+                        }
+                        else {
+                            console.log("Feil kort!");
+                            // Hvis ikke par må vi snu kortene tilbake
+                            setTimeout(function() {
+                                document.getElementById(kort1_id).style.backgroundColor = "yellow";
+                                document.getElementById(kort1_id).style.transform = "rotateY(180deg)";
+                                document.getElementById(kort1_id).style.color = "yellow";
+                                document.getElementById(kort1_id).innerHTML = "";
+
+                                document.getElementById(kort2_id).style.backgroundColor = "yellow";
+                                document.getElementById(kort2_id).style.transform = "rotateY(180deg)";
+                                document.getElementById(kort2_id).style.color = "yellow";
+                                document.getElementById(kort2_id).innerHTML = "";
+                                trykketForsteKort = false;
+                                antKort = 0;
+                            },3000);
+
+                        }
+                    }
+                    else {
+                        antKort = 1;
+                    }
+
+                };
+                document.getElementById("spillbrett").appendChild(bilde);
+                trykketForsteKort = false;
+
+            }
+        }
+
+
+    </script>
+    <style>
+        #spillbrett {
+            width: 90vw;
+            height: 97vh;
+            border: solid black 1px;
+            background-color: #848484;
+            margin: auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+        .bildekort {
+            width: 20%;
+            height: 19%;
+            background-color: yellow;
+            box-shadow: black 5px 5px 10px;
+            border: solid black 1px;
+            margin-top: 0.5%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1%;
+            transform: rotateY(180deg);
+            color: yellow;    /* gul farge på tekst så den er usynlig fra starten */
+            transition: 0.5s;
+        }
+
+    </style>
+</head>
+<body>
+<div id="spillbrett">
+
+</div>
+
+
+
+</body>
+</html>
