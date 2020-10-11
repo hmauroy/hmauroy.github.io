@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="https://hmauroy.github.io/8bitHenrik.png">
+    <meta name="author" content="Henrik Mauroy">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Vitaminer, mineraler og vann</title>
+    <script src="shuffle_array.js"></script>
+    <script>
+        window.onload = oppstart;
+
+        var navnInfo = [
+            ["C-vitaminer","Viktig for opptak av jern, nødvendig for dannelse av bein og brusk og for at sår skal gro."],
+            ["Jern","Nødvendig for å få nok hemoglobin i blodet."],
+            ["Kalsium","Nødvendig for skjelett og tenner."],
+            ["B-vitaminer","Er med på å bryte ned fett, karbohydrater og proteiner. Deltar i dannelsen av røde blodceller."]
+        ];
+
+        // bretter ut arrayet så vi kan lage par
+        var arrayLengde = navnInfo.length;   // finner lengden til arayet
+        var navn = [];
+        for(let i=0; i<arrayLengde; i++) { // dobler arrayet ved å pushe to ganger
+            navn.push([i,navnInfo[i][1]]); // legger til informasjonen som infotekst pluss indeksen som blir parvis lik
+            navn.push([i,navnInfo[i][0]]); // legger til navnet som infotekst
+        }
+
+
+        var trykketForsteKort = false;
+
+        //console.log(navn);
+        shuffle(navn);    // stokker om på informasjonen
+        //console.log(navn);
+
+        var kort1 = "";
+        var kort1_id = "";
+        var kort1_tekst = "";
+        var kort2_id = "";
+
+        /*
+        Klassisk Memory-spill.
+        Bildene er unike div-er som er klikkbare.
+         */
+
+        function oppstart() {
+            // Hovedprogramkode her...
+            // 1) Generere div-er med onclick-event
+            // 2) Når div klikkes startes funksjon som
+            // a) snur bildet
+            // b) starter timer for hvor lang tid man har
+            // på å snu neste bilde
+            // 3) Starte funksjon for å sjekke par
+            // ved å sette to variabler lik id til bildene.
+            var skrivInfo = false;
+            var antKort = 0;
+            for(var i=0; i<navn.length; i++) {
+                var bilde = document.createElement("div");
+                bilde.className = "bildekort";
+                bilde.id = "" + i;
+                bilde.personligTall = navn[i][0]; // henter ut tallet som er unikt for hvert par
+                bilde.tekst = navn[i][1]; // henter ut teksten: enten navnet eller forklaringen
+                bilde.onclick = function() {
+                    antKort++;
+                    // vise bilde
+                    //this.style.backgroundColor = farger[this.personligTall];   // setter fargen som er likt for hvert par pga 'personligTall' deles av parene
+                    if(trykketForsteKort === false && antKort === 1) {
+                        trykketForsteKort = true;
+                        this.style.backgroundColor = "white"   // gir hvit farge pga enkelt å lese
+                        this.innerHTML = this.tekst;
+                        // Oppdaterer informasjon om hvilket
+                        // kort som er valgt
+                        kort1 = this.personligTall;   // henter ut tallet som er unikt for hvert par
+                        kort1_tekst = this.tekst;
+                        kort1_id = this.id;
+                    }
+                    else if(trykketForsteKort === true && antKort === 2) {
+                        // Må oppdatere informasjon om hvilken id kortet har
+                        kort2_id = this.id;
+                        this.style.backgroundColor = "white"   // gir hvit farge pga enkelt å lese
+                        this.innerHTML = this.tekst;
+                        // Sjekker om vi har et par
+                        if(this.personligTall === kort1 && this.tekst !== kort1_tekst) { // sjekker om unikt tall for parene er det samme
+                            // Vi har et par!!!!!!!! ^_^
+                            console.log("Par med " + kort1);
+                            document.getElementById(kort1_id).style.backgroundColor = "lawngreen";
+                            document.getElementById(kort2_id).style.backgroundColor = "lawngreen";
+                            antKort = 0;
+                            trykketForsteKort = false;
+                        }
+                        else {
+                            console.log("Feil kort!");
+                            // Hvis ikke par må vi snu kortene tilbake
+                            setTimeout(function() {
+                                document.getElementById(kort1_id).style.backgroundColor = "yellow";
+                                document.getElementById(kort1_id).innerHTML = "";
+                                document.getElementById(kort2_id).style.backgroundColor = "yellow";
+                                document.getElementById(kort2_id).innerHTML = "";
+                                trykketForsteKort = false;
+                                antKort = 0;
+                            },3000);
+
+                        }
+                    }
+
+                };
+                document.getElementById("spillbrett").appendChild(bilde);
+                trykketForsteKort = false;
+
+            }
+
+
+        }
+
+
+    </script>
+    <style>
+        #spillbrett {
+            width: 70vw;
+            height: 90vh;
+            border: solid black 1px;
+            background-color: #848484;
+            margin: auto;
+            margin-top: 5vh;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+        .bildekort {
+            width: 20%;
+            height: 20%;
+            background-color: yellow;
+            box-shadow: black 5px 5px 10px;
+            border: solid black 1px;
+            margin-top: 2%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1%;
+        }
+
+    </style>
+</head>
+<body>
+<div id="spillbrett">
+
+</div>
+
+
+
+</body>
+</html>
