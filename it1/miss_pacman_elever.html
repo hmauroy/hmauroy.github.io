@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="https://hmauroy.github.io/8bitHenrik.png">
+    <meta name="author" content="Henrik Mauroy">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Miss Pacman</title>
+    <style>
+        body {
+            background-color: black;
+            margin: 0;
+        }
+        #innpakning {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: solid white 1px;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <div id="innpakning"></div>
+
+    <script src="miss_pacman.js"></script>
+    <script>
+        var innpakning = document.querySelector("#innpakning");
+        var missP = new MissPacman();
+        missP.draw(innpakning);
+
+        var isPlaying = true;
+        var teller = 0;
+        loop();
+        function loop() {
+            if(isPlaying) {
+                teller += 1;
+                if(teller > 3000) {
+                    isPlaying = false;
+                }
+                missP.oppdater(innpakning);
+                // Kjører loopen på nytt
+                requestAnimationFrame(loop);    // 60 FPS
+            }
+            else {
+                // Stopper spillet
+                console.log("Spill stoppet");
+            }
+
+        }
+
+
+    </script>
+
+</body>
+
+
+</html>
