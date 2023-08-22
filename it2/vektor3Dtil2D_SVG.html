@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Henrik Mauroy">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>3D til 2D</title>
+    <script>
+        window.onload = oppstart;   // Når siden har lastet ferdig starter vi oppstart
+
+        var v1 = [0.5,-0.5,-0.5]; // x,y,z
+        var v2 = [0.5,0.5,-0.5]; // x,y,z
+        var v3 = [0.5,-0.5,0.5]; // x,y,z
+        var v4 = [0.5,0.5,0.5]; // x,y,z
+        var v5 = [-0.5,-0.5,-0.5]; // x,y,z
+        var v6 = [-0.5,0.5,-0.5]; // x,y,z
+        var v7 = [-0.5,-0.5,0.5]; // x,y,z
+        var v8 = [-0.5,0.5,0.5]; // x,y,z
+
+
+        var plan = [v1,v2,v3,v4,v5,v6,v7,v8];
+
+        var v1_xy = projectXY(v1);
+        //c(v1_xy);
+
+        var vinkel = 0.01;  // rotasjonsvinkel mellom hver frame (60fps)
+
+        // Variabler for SVG-grafikken
+        var tegneflate;
+
+        function projectXY(vect) {
+            // Projiserer på XY-planet ved å gange med 2x3-matrisen
+            // 1 0 0
+            // 0 1 0
+            let M = [[1,0,0],[0,1,0]];
+            return prikkprodukt(M,vect);
+        }
+
+        function rotateY(vect,angle) {
+            // Roterer om y-aksen
+            let M = [
+                [Math.cos(angle),0,Math.sin(angle)],
+                [0,1,0],
+                [-Math.sin(angle),0,Math.cos(angle)]];
+            return prikkprodukt(M,vect);
+        }
+        function rotateX(vect,angle) {
+            // Roterer om x-aksen
+            let M = [
+                [1,0,0],
+                [0,Math.cos(angle),-Math.sin(angle)],
+                [0,Math.sin(angle),Math.cos(angle)]];
+            return prikkprodukt(M,vect);
+        }
+        function rotateZ(vect,angle) {
+            // Roterer om z-aksen
+            let M = [
+                [Math.cos(angle),-Math.sin(angle),0],
+                [Math.sin(angle),Math.cos(angle),0],
+                [0,0,1]];
+            return prikkprodukt(M,vect);
+        }
+
+        function prikkprodukt(M, v) {
+            let vektor = [];
+            for(let i=0; i<M.length; i++) {
+                let buf = 0;
+                for(let j=0; j<M[i].length; j++) {
+                    buf += M[i][j] * v[j];    // Ganger matrise med vektor i riktig rekkefølge
+                    //c(M[i][j] + "*" + v[j] + "= " + M[i][j] * v[j]);
+                    //c(" ");
+                }
+                vektor.push(buf);   // legger koordinat inn i vektor
+            }
+            return vektor;
+        }
+
+        function oppstart() {
+            tegneflate = d("tegneflate");
+            loop();
+        }
+
+        function loop() {
+            // Roterer om y-aksen og Projiserer planet på xy-planet
+            //vinkel = 0.3;
+            let plan_xy = [];
+            for(let i=0; i<plan.length; i++) {
+                plan[i] = rotateY(plan[i],vinkel); // Oppdaterer vektor med ny rotasjon
+                plan[i] = rotateX(plan[i],-vinkel/5); // Oppdaterer vektor med ny rotasjon
+                plan[i] = rotateZ(plan[i],-vinkel); // Oppdaterer vektor med ny rotasjon
+                let v = projectXY(plan[i]);
+                plan_xy.push(v);
+            }
+            // Tegner
+            tegn(plan_xy);
+
+            // Starter timeout før tegning av neste frame
+            requestAnimationFrame(loop);
+        }
+
+        function clearSVG() {
+            while(tegneflate.firstChild) { // fjerner inntil det ikke finnes noe første barn lenger
+                tegneflate.removeChild(tegneflate.firstChild);
+            }
+        }
+
+        function tegn(arr) {
+            clearSVG();
+            let rect = tegneflate.getBoundingClientRect();
+            let bredde = rect.width;
+            let hoyde = rect.height;
+            let x_0 = bredde/2; // Finner midten i x-retning av rutenettet
+            let y_0 = hoyde/2; // Finner midten i y-retning av rutenettet
+            // Tegner sentrum
+            tegnSirkel(x_0,y_0,5,255,100,40);
+            // Finner lengde på enhetsvektor
+            let ux = (bredde-x_0)/1; // Enhetsvektorene er halvparten så lang som koordinatsystemet
+            let uy = (hoyde-y_0)/1;
+            //c(ux + "," + uy);
+            let kuleArr = [];
+            for(let i=0; i<arr.length; i++) {
+                // Lager en kule i enden av vektor v_i
+                let x = x_0 + arr[i][0]*ux; // Plukker ut x-koordinat
+                let y = y_0 + arr[i][1]*uy; // Plukker ut y-koordinat
+                kuleArr.push([x,y]);
+                tegnSirkel(x,y,25,228,155,154);
+            }
+            // Tegner kantene i boksen: linjer mellom kulene.
+            // OBS! Har definert boksens hjørner litt random så det er ikke noe system
+            // i hvilke kuler som kobler til hverandre
+            // 1. flate
+            connect(0,1,kuleArr);
+            connect(0,2,kuleArr);
+            connect(2,3,kuleArr);
+            connect(1,3,kuleArr);
+            // 2. flate
+            connect(4,5,kuleArr);
+            connect(4,6,kuleArr);
+            connect(6,7,kuleArr);
+            connect(5,7,kuleArr);
+            // Kobler de to flatene sammen
+            connect(0,4,kuleArr);
+            connect(1,5,kuleArr);
+            connect(2,6,kuleArr);
+            connect(3,7,kuleArr);
+        }
+
+        function connect(i,j,arr) {
+            // Tegner en linje mellom vektorene med indeks i og j
+            let a = arr[i];
+            let b = arr[j];
+            tegnStrek(a[0],a[1],b[0],b[1]);
+        }
+
+        function tegnStrek(x0,y0,x1,y1) {
+            // DOM-generering OBS! MÅ ha createElementNS (name space)
+            let strek = document.createElementNS('http://www.w3.org/2000/svg','line'); // Lager en svg-strek
+            strek.setAttribute("x1",x0 + "");
+            strek.setAttribute("y1",y0 + "");
+            strek.setAttribute("x2",x1 + "");
+            strek.setAttribute("y2",y1 + "");
+            let RR = 255;
+            let GG = 255;
+            let BB = 255;
+            let farge = "rgb("+ RR + "," + GG + "," + BB + ")";
+            strek.style.stroke = farge;
+            //strek.style.stroke = "rgb("+ 0 + "," + 0 + "," + 0 + ")";
+            strek.style.strokeWidth = 2;
+            //svg[svg.length-1].appendChild(strek);   // legger streken inn i det siste svg-elementet
+            tegneflate.appendChild(strek);   // legger streken inn i tegneflaten
+        }
+        function tegnSirkel(x1,y1,rad,RR,GG,BB) {
+            let sirkel = document.createElementNS('http://www.w3.org/2000/svg','circle'); // Lager en svg-sirkel
+            sirkel.setAttribute("cx",x1);
+            sirkel.setAttribute("cy",y1);
+            sirkel.setAttribute("r",rad);
+            let farge = "rgb("+ RR + "," + GG + "," + BB + ")";
+            sirkel.setAttribute("fill", farge);
+            tegneflate.appendChild(sirkel); // legger streken inn i det siste svg-elementet
+        }
+
+
+        function d(id) {
+            return document.getElementById(id); // returnerer håndtaket (handle) til id vi sender inn
+        }
+
+        function c(tekst) {
+            console.log(tekst); // skriver ut 'tekst' til konsollen. Da slipper vi å skrive console.log(tekst) og sparer tid ^_^
+        }
+
+    </script>
+    <style>
+        #tegneflate {
+            width: 40vw;
+            height: 40vw;
+            background-color: black;
+            border: solid #e4ff68 1px;
+            position: absolute;
+            top: 10vh;
+            left: 30vw;
+        }
+        .kule {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            width: 1vw;
+            height: 1vw;
+        }
+
+    </style>
+</head>
+<body>
+<svg id="tegneflate">
+    <!-- Her settes det inn svg-elementer fortløpende. Én svg-tag per strek tegnet med penDOWN.
+    Kan brukes til å angre streker -->
+    <line x1="0" y1="0" x2="100" y2="150" style="stroke:rgb(255,0,0);stroke-width:2;" />
+</svg>
+
+</body>
+</html>
