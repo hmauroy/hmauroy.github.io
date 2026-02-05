@@ -8,11 +8,15 @@
     <title>IT1 ressursside</title>
     <script>
         window.onload = oppstart;
-
         function oppstart() {
             // Hovedprogramkode her...
+            
+            // Add download attribute to all links with class "download"
+            const downloadLinks = document.querySelectorAll('a.download');
+            downloadLinks.forEach(link => {
+                link.setAttribute('download', '');
+            });
         }
-
     </script>
     <style>
         body {
@@ -23,14 +27,12 @@
         a {
             text-decoration: none;
         }
-
     </style>
 </head>
 <body>
 <h1>IT1 ressursside</h1>
 <a href="viewportSizeFinder.html">Viewport Size Finder</a> <br>
 <h2>Bilanimasjon</h2>
-    <a href="bilen.png">bilen.png</a> <br>
+    <a href="bilen.png" class="download">bilen.png</a> <br>
 </body>
-
 </html>
