@@ -1,0 +1,43 @@
+<!DOCTYPE html/>
+<html>
+<head>
+	<title>Animasjon</title> 
+	<meta charset="UTF-8">
+<style>
+  body{
+    background-color: black;
+  }
+  .rotor{
+    background-image: url(rotor.png);
+    width:200px;
+    height:200px;
+    margin:auto;
+    animation:roter 3s linear infinite;
+  }
+@keyframes roter{
+    0%{transform:rotate(0deg);}
+    100%{transform:rotate(360deg);}
+}
+</style>
+<body>
+    <button id ="sakte">Sakte</button>
+    <button id = "raskt">Raskt</button>
+    <div class = "rotor"></div>
+<script>
+	let rotorEl = document.querySelector(".rotor");
+    let sakteEl = document.querySelector("#sakte");
+    let rasktEl = document.querySelector("#raskt");
+
+    sakteEl.addEventListener("click",sakte);
+        function sakte(){
+            rotorEl.style.animationDuration = "5s";
+        }
+    rasktEl.addEventListener("click",rask);
+        function rask(){
+            rotorEl.style.animationDuration = "1s";
+        }
+    
+</script>
+</body>
+
+</html>
